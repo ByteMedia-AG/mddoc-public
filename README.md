@@ -1,4 +1,9 @@
 # MdDoc
+[![GitHub stars](https://img.shields.io/github/stars/ByteMedia-AG/mddoc-public.svg?style=social)](https://github.com/ByteMedia-AG/mddoc-public/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ByteMedia-AG/mddoc-public.svg?style=social)](https://github.com/ByteMedia-AG/mddoc-public/network)
+[![GitHub issues](https://img.shields.io/github/issues/ByteMedia-AG/mddoc-public.svg)](https://github.com/ByteMedia-AG/mddoc-public/issues)
+[![GitHub license](https://img.shields.io/github/license/ByteMedia-AG/mddoc-public.svg)](https://github.com/ByteMedia-AG/mddoc-public/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/ByteMedia-AG/mddoc-public.svg)](https://github.com/ByteMedia-AG/mddoc-public/commits/main)
 
 ## About MdDoc
 
