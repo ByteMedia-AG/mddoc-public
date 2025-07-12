@@ -22,7 +22,7 @@ Follow these steps to set up the project in a local development environment.
 ### Setup
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/your-project.git
+git clone https://github.com/ByteMedia-AG/mddoc-public.git
 cd your-project
 ```
 #### 2. Create and activate a virtual environment
