@@ -1,0 +1,75 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<div class="container px-3">
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <div>
+            <i class="fs-4 bi-chat-right-quote me-4"></i>
+        </div>
+        <div>
+            As far as possible, the following information was extracted from the designated source:
+            Title, meta information, headings and links. The following text is available in Markdown
+            format and can be copied in whole or in part and used as content.
+        </div>
+    </div>
+    <div class="px-3 pt-4 pb-2 mb-3 rounded">
+    <pre><code>## {{ data.title }}
+
+### Meta data
+
+{% for k, v in data.meta %}* **{{ k }}** - {{ v }}
+{% endfor %}
+
+### Headings
+
+{% for k, v in data.headings %}* **{{ v }}** - {{ k }}
+{% endfor %}
+
+### Links
+{% for link_text, href in data.links %}* [{{link_text}}]({{ href }})
+{% endfor %}
+    </code></pre>
+    </div>
+</div>
+<a class="link-secondary" id="btn-back-to-top">
+    <i class="bi bi-arrow-up-circle-fill" style="font-size:50px;"></i>
+</a>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    let back_to_top_button = document.getElementById("btn-back-to-top");
+
+    window.onscroll = function () {
+        scrollFunction();
+    };
+
+    function scrollFunction() {
+        if (
+            document.body.scrollTop > 800 ||
+            document.documentElement.scrollTop > 800
+        ) {
+            back_to_top_button.style.display = "block";
+        } else {
+            back_to_top_button.style.display = "none";
+        }
+    }
+
+    back_to_top_button.addEventListener("click", backToTop);
+
+    function backToTop() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+</script>
+{% endblock %}

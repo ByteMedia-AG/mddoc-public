@@ -1,0 +1,22 @@
+{% if is_revised %}
+<div class="alert alert-warning d-flex align-items-center position-relative" role="alert">
+    <div>
+        <i class="h3 bi-clock-history me-4"></i>
+    </div>
+    {% if is_deleted %}
+    <div>
+        This entry is an earlier revision of the current entity. It cannot be updated directly,
+        but can be restored. If this is necessary, please use the button at the top right of the toolbar.
+    </div>
+    {% else %}
+    <div>
+        This entry is an archived previous version of the current entity and can be restored if
+        necessary (use the button in the top right-hand corner of the toolbar). This version is
+        not marked as deleted and remains in the database until the current entity is deleted.
+    </div>
+    {% endif %}
+    <a href="{% url 'doc-detail' successor_id %}" class="stretched-link">
+        <span class="visually-hidden">Link to the current entity</span>
+    </a>
+</div>
+{% endif %}

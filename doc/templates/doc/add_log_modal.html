@@ -1,0 +1,20 @@
+<!-- Add log modal -->
+<div aria-hidden="true" aria-labelledby="addLogModalLabel" class="modal fade" id="addLogModal" style="top: 70px;" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLogModalLabel">Add a log entry</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <form method="post" action="{% url 'doc-add-log' doc_id %}">{% csrf_token %}
+                <div class="modal-body">
+                    <textarea class="form-control" name="log_entry" rows="6"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" data-bs-dismiss="modal" type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+{% include 'docs/navbar.html' %}
+<div class="container">
+    {% if error %}
+    {% include 'docs/error.html' %}
+    {% endif %}
+    {% include 'docs/search_form.html' %}
+</div>
+<div class="container">
+    {% if request.GET.mtr and request.GET.ustr %}
+    {% include 'docs/doc_selection.html' %}
+    {% elif request.GET.bop %}
+    {% include 'docs/doc_bulk_selection.html' %}
+    {% else %}
+    {% include 'docs/search_results.html' %}
+    {% endif %}
+</div>
+{% include 'docs/search_syntax_modal.html' %}
+{% include 'docs/add_log_entry_modal.html' %}
+{% endblock content %}
+
+{% block extra_js%}
+{% include 'docs/extra_js.html' %}
+{% endblock %}

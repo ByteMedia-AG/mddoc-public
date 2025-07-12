@@ -1,0 +1,36 @@
+<div class="container">
+    <div class="d-flex justify-content-between mb-3 border rounded bg-body-tertiary">
+        <div class="p-2 bd-highlight">
+            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back to search">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        </div>
+        <div class="p-2 bd-highlight">
+            <form method="post" target="_blank" action="{% url 'doc-tr-analyse-download' %}">{% csrf_token %}
+                {% for key, value in request.POST.lists %}
+                    {% if key != 'csrfmiddlewaretoken' %}
+                        {% for v in value %}
+                            <input type="hidden" name="{{ key }}" value="{{ v }}">
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <div class="btn-group" role="group" aria-label="Download in the specified format">
+                    <button type="submit" name="dcsv" value="1" class="btn btn-primary">
+                        <i class="bi bi-download me-2"></i> CSV
+                    </button>
+                    <button type="submit" name="dxlsx" value="1" class="btn btn-primary">
+                        <i class="bi bi-download me-2"></i> XLSX
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="p-2 bd-highlight">
+            <a class="btn btn-success me-2" data-bs-target="#setSettledModal" data-bs-toggle="modal" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Set to settled">
+                <i class="bi bi-receipt"></i>
+            </a>
+            <a class="btn btn-danger" data-bs-target="#setDeletedModal" data-bs-toggle="modal" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Delete">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rows = document.querySelectorAll('.selectable-row');
+        const headerCheckbox = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll(".row-checkbox");
+        const submitButton = document.querySelector('button[form="selected-time-records"]');
+        function updateButtonState() {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            submitButton.disabled = !anyChecked;
+        }
+        rows.forEach(row => {
+            row.addEventListener('click', function (event) {
+                if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') return;
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    updateButtonState();
+                }
+            });
+        });
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", updateButtonState);
+        });
+        if (headerCheckbox) {
+            headerCheckbox.addEventListener('change', function () {
+                const checked = headerCheckbox.checked;
+                document.querySelectorAll('.row-checkbox').forEach(cb => {
+                    cb.checked = checked;
+                });
+                updateButtonState();
+            });
+        }
+        updateButtonState();
+    });
+</script>

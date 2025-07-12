@@ -1,0 +1,105 @@
+{% load static %}
+
+{% if is_test or is_archive %}
+    {% with header_bg="#fd7e14" %}
+        <header class="mb-3 border-bottom sticky sticky-top top-0" data-bs-theme="dark" style="background-color: {{ header_bg }};">
+    {% endwith %}
+{% else %}
+    {% with header_bg="#6f42c1" %}
+        <header class="mb-3 border-bottom sticky sticky-top top-0" data-bs-theme="dark" style="background-color: {{ header_bg }};">
+    {% endwith %}
+{% endif %}
+    <div class="container">
+        <nav class="navbar navbar-expand-lg p-0">
+            <div class="container-fluid mx-0 px-0">
+                <a class="navbar-brand p-0 ms-3" href="/">
+                    {% if is_archive %}
+                    <i class="bi bi-archive-fill fs-1 p-0"></i>
+                    {% elif is_test %}
+                    <i class="bi bi-question-octagon fs-1 p-0"></i>
+                    {% else %}
+                    <i class="bi bi-cloud-upload fs-1 p-0"></i>
+                    {% endif %}
+                </a>
+                {% if user.is_authenticated %}
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+                        <li class="nav-item dropdown pe-0 me-4">
+                            <button class="btn btn-link nav-link px-0 py-2 dropdown-toggle d-flex align-items-center" id="utils" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Utils">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="utils">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'doc-status' %}">
+                                        <i class="bi bi-speedometer me-2"></i> Status
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'doc-dump-database' %}">
+                                        <i class="bi bi-filetype-sql me-2"></i> Dump database
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'doc-cleanup-database' %}">
+                                        <i class="bi bi-database-fill-gear me-2"></i> Cleanup database
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'doc-cleanup-upload-directory' %}">
+                                        <i class="bi bi-hdd me-2"></i> Cleanup upload directory
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown pe-0 me-4">
+                            <button class="btn btn-link nav-link px-0 py-2 dropdown-toggle d-flex align-items-center" id="nav-user" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="User">
+                                <i class="bi bi-person-fill"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user">
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item d-flex align-items-center">
+                                            <i class="bi bi-box-arrow-right me-3"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown pe-0 me-0">
+                            <button class="btn btn-link nav-link px-0 py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme (dark)">
+                                <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text">
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                        <i class="bi bi-sun me-3"></i> Light
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="true">
+                                        <i class="bi bi-moon-stars-fill me-3"></i> Dark
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                                        <i class="bi bi-circle-half me-3"></i> Auto
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-link nav-link ms-3" id="nav-back-to-top">
+                                <i class="bi bi-arrow-up-circle-fill"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+</header>

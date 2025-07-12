@@ -1,0 +1,167 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<style>
+    .editor-toolbar {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.25rem;
+    }
+    [data-bs-theme=dark] .editor-toolbar button {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 1.1rem;
+      padding: 0.4rem 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      border-radius: 0.25rem;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    [data-bs-theme=dark] .editor-toolbar button:hover,
+    [data-bs-theme=dark] .editor-toolbar button:focus,
+    [data-bs-theme=dark] .editor-toolbar button.active {
+      color: #fff;
+      background-color: #333;
+    }
+    [data-bs-theme=dark] .CodeMirror {
+      background-color: var(--bs-body-bg);
+      color: #eee;
+    }
+    [data-bs-theme=dark] .CodeMirror-cursor {
+      border-left: 1px solid #fff !important;
+    }
+    [data-bs-theme=dark] .CodeMirror-selected,
+    [data-bs-theme=dark] .CodeMirror ::selection {
+        background: #666 !important;
+        color: #fff !important;
+    }
+    [data-bs-theme=dark] .editor-preview,
+    [data-bs-theme=dark] .editor-statusbar {
+        background-color: var(--bs-body-bg);
+        color: #ddd;
+        border-color: #2a2a2a;
+    }
+    [data-bs-theme=dark] .editor-statusbar {
+        color: #999;
+    }
+    .CodeMirror {
+        border: 0 !important;
+    }
+    .EasyMDEContainer .editor-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 8;
+        border: 0;
+        border-bottom: var(--bs-border-width) solid var(--bs-border-color);
+        background-color: var(--bs-body-bg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'doc_edit/navbar.html' %}
+<div class="container">
+    <h1 class="h2 mb-4">{{ page_title }}</h1>
+    {% if show_revision_warning %}
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-exclamation-triangle-fill me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">Minor changes?</h2>
+            <div class="mb-1">
+                This entity is currently not labelled as archived. Although a revision is
+                created when it is saved, this can be lost when the database is cleaned up.
+                If you want to retain the status quo permanently (as a version), you must
+                set the entry to archived before updating.
+                <a href="{% url 'doc-detail' doc_id %}" class="alert-link">The archive flag can be set here.</a>
+            </div>
+            <div class="mb-1">
+                If you are only making minor changes and the current status does not need to
+                be permanently retained, then you can proceed without worrying.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <form method="post" class="mb-5" enctype="multipart/form-data" id="doc-edit" novalidate>
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>
+    let markdownCheckbox = document.getElementById("id_is_markdown");
+    let textarea = document.getElementById("id_text");
+    let easyMDE = null;
+
+    function initEasyMDE() {
+        if (!easyMDE) {
+            easyMDE = new EasyMDE({
+                element: document.getElementById("id_text"),
+                spellChecker: false,
+                toolbar: [
+                    {
+                      name: "bold",
+                      action: EasyMDE.toggleBold,
+                      className: "bi bi-type-bold",
+                      title: "Fett"
+                    },
+                    {
+                      name: "italic",
+                      action: EasyMDE.toggleItalic,
+                      className: "bi bi-type-italic",
+                      title: "Kursiv"
+                    },
+                    {
+                      name: "heading",
+                      action: EasyMDE.toggleHeadingSmaller,
+                      className: "bi bi-type-h1",
+                      title: "Überschrift"
+                    },
+                    {
+                      name: "code",
+                      action: EasyMDE.toggleCodeBlock,
+                      className: "bi bi-code-slash",
+                      title: "Codeblock"
+                    },
+                    {
+                      name: "unordered-list",
+                      action: EasyMDE.toggleUnorderedList,
+                      className: "bi bi-list-ul",
+                      title: "Ungeordnete Liste"
+                    },
+                    {
+                      name: "ordered-list",
+                      action: EasyMDE.toggleOrderedList,
+                      className: "bi bi-list-ol",
+                      title: "Geordnete Liste"
+                    },
+                ],
+                status: false
+            });
+        }
+    }
+    function destroyEasyMDE() {
+        if (easyMDE) {
+            easyMDE.toTextArea();
+            easyMDE = null;
+        }
+    }
+    function toggleEditor() {
+        if (markdownCheckbox.checked) {
+            initEasyMDE();
+        } else {
+            destroyEasyMDE();
+        }
+    }
+    toggleEditor();
+    markdownCheckbox.addEventListener("change", toggleEditor);
+</script>
+{% endblock %}

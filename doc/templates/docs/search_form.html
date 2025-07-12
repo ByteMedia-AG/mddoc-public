@@ -1,0 +1,181 @@
+<form class="mb-3 p-2 border rounded bg-body-tertiary" id="refined_search">
+    <div id="active-tags" class="d-flex flex-row"></div>
+    <div class="d-flex flex-row gap-0 mb-3 align-items-center">
+        <div class="input-group me-2">
+            <input aria-label="Search" class="form-control shadow-none border" id="id_search" name="search" placeholder="Search string..." type="search" value="{% if params.search %}{{ params.search }}{% endif %}">
+            <span class="input-group-text text-secondary"># {{ num_matches }}</span>
+        </div>
+        <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#collapseTimeRange" role="button" aria-expanded="false" aria-controls="collapseTimeRange" data-toggle="tooltip" title="Time range search">
+            <i class="bi bi-clock-history"></i>
+        </a>
+        <button class="btn btn-outline-secondary" type="submit">
+            <span class="bi-search"/>
+        </button>
+    </div>
+    <div class="{% if not params.cgte and not params.clte and not params.ugte and not params.ulte and not params.tgte and not params.tlte %}collapse{% endif %}" id="collapseTimeRange">
+        <div class="d-flex flex-row gap-2">
+            <div class="input-group">
+                <div class="form-floating mb-1">
+                    <input class="form-control" id="cgte" name="cgte" type="datetime-local" value="{{ params.cgte }}">
+                    <label for="cgte">Created after...</label>
+                </div>
+                <div class="form-floating">
+                    <input class="form-control" id="clte" name="clte" type="datetime-local" value="{{ params.clte }}">
+                    <label for="clte">...and before...</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="form-floating mb-1">
+                    <input class="form-control" id="ugte" name="ugte" type="datetime-local" value="{{ params.ugte }}">
+                    <label for="ugte">Updated after...</label>
+                </div>
+                <div class="form-floating">
+                    <input class="form-control" id="ulte" name="ulte" type="datetime-local" value="{{ params.ulte }}">
+                    <label for="ulte">...and before...</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="form-floating mb-1">
+                    <input class="form-control" id="tgte" name="tgte" type="datetime-local" value="{{ params.tgte }}">
+                    <label for="tgte">Doc time greater than...</label>
+                </div>
+                <div class="form-floating">
+                    <input class="form-control" id="tlte" name="tlte" type="datetime-local" value="{{ params.tlte }}">
+                    <label for="tlte">...and less than...</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if tags %}
+    <div class="mt-3">
+        {% for first_letter, tag_group in tags %}
+        <div class="btn-group mb-2 me-2" role="group" aria-label="Tag group {{ first_letter }}">
+            <button class="btn btn-secondary btn-sm disabled opacity-75" type="button">
+                {{ first_letter }}
+            </button>
+            {% for tag in tag_group %}
+            <button class="btn btn-outline-secondary btn-sm {% if tag.is_last_in_group %}me-1{% endif %}" value="#{{ tag.slug }}" onclick="appendTagAndSubmit(this)" type="button">
+               <span class="text-secondary-emphasis text-nowrap">
+                   {{ tag.name|title }}
+               </span>
+            </button>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex flex-row gap-3">
+            {% with flg_checked=params.flg|yesno:'checked,' %}
+            <input autocomplete="off" class="btn-check" id="flg" name="flg" onchange="this.form.submit()" type="checkbox" {{flg_checked}}>
+            {% endwith %}
+            <label class="btn btn-sm btn-outline-success text-start pe-lg-4" for="flg" data-placement="top" data-toggle="tooltip" title="Filter flagged docs">
+                <i class="bi-flag me-0 me-lg-2"></i>
+                <span class="d-none d-lg-inline">FLAG</span>
+            </label>
+            {% with iar_checked=params.iar|yesno:'checked,' %}
+            <input autocomplete="off" class="btn-check" id="iar" name="iar" onchange="this.form.submit()" type="checkbox" {{iar_checked}}>
+            {% endwith %}
+            <label class="btn btn-sm btn-outline-info text-start pe-lg-4" for="iar" data-placement="top" data-toggle="tooltip" title="Include archived docs">
+                <i class="bi-archive me-lg-2"></i>
+                <span class="d-none d-lg-inline">ARCH</span>
+            </label>
+            {% with idr_checked=params.idr|yesno:'checked,' %}
+            <input autocomplete="off" class="btn-check" id="idr" name="idr" onchange="this.form.submit()" type="checkbox" {{idr_checked}}>
+            {% endwith %}
+            <label class="btn btn-sm btn-outline-danger text-start pe-lg-4" for="idr" data-placement="top" data-toggle="tooltip" title="Include deleted docs">
+                <i class="bi-trash me-lg-2"></i>
+                <span class="d-none d-lg-inline">DEL</span>
+            </label>
+            {% with ipr_checked=params.ipr|yesno:'checked,' %}
+            <input autocomplete="off" class="btn-check" id="ipr" name="ipr" onchange="this.form.submit()" type="checkbox" {{ipr_checked}}>
+            {% endwith %}
+            <label class="btn btn-sm btn-outline-warning text-start pe-lg-4" for="ipr" data-placement="top" data-toggle="tooltip" title="Include revisions">
+                <i class="bi-arrow-counterclockwise me-lg-2"></i>
+                <span class="d-none d-lg-inline">REV</span>
+            </label>
+            <div aria-label="Time records button group" class="btn-group" role="group">
+                {% with ustr_checked=params.ustr|yesno:'checked,' %}
+                <input autocomplete="off" class="btn-check" id="ustr" name="ustr" onchange="this.form.submit()" type="checkbox" {{ustr_checked}}>
+                {% endwith %}
+                <label class="btn btn-sm btn-outline-primary text-start pe-lg-4" for="ustr" data-placement="top" data-toggle="tooltip" title="Filter docs with unsettled time records">
+                    <i class="bi-clock-history me-lg-2"></i>
+                    <span class="d-none d-lg-inline">TIME</span>
+                </label>
+                {% if params.ustr %}
+                {% with mtr_checked=params.mtr|yesno:'checked,' %}
+                <input autocomplete="off" class="btn-check" id="mtr" name="mtr" onchange="this.form.submit()" type="checkbox" {{mtr_checked}}>
+                {% endwith %}
+                <label class="btn btn-sm btn-outline-primary" for="mtr" data-placement="top" data-toggle="tooltip" title="Open selection">
+                    <i class="bi-gear-fill"></i>
+                </label>
+                {% else %}
+                <input autocomplete="off" class="btn-check" disabled id="mtr-disabled" name="mtr" type="checkbox">
+                <label class="btn btn-sm btn-outline-primary" for="mtr-disabled">
+                    <i class="bi-gear-fill"></i>
+                </label>
+                {% endif %}
+            </div>
+        </div>
+        {% if not params.mtr or not params.ustr %}
+        <div class="d-flex flex-row gap-3">
+            <div>
+                {% with bop_checked=params.bop|yesno:'checked,' %}
+                <input autocomplete="off" class="btn-check" id="bop" name="bop" onchange="this.form.submit()" type="checkbox" {{bop_checked}}>
+                {% endwith %}
+                <label class="btn btn-sm btn-outline-secondary text-start pe-lg-3" for="bop">
+                    <i class="bi-gear-fill me-lg-2"></i>
+                    <span class="d-none d-lg-inline">BULK</span>
+                </label>
+            </div>
+            <div class="btn-group" role="group">
+                <input type="hidden" name="orderby" id="id_order_by" value="{{ oby }}">
+                <div class="dropdown" id="ordinate">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" onchange="this.form.submit()" data-placement="top" data-toggle="tooltip" title="Order criterion">
+                        {% if oby == 'updated' %}
+                        <i class="bi bi-clock"></i>
+                        {% elif oby == 'created' %}
+                        <i class="bi bi-clock-fill"></i>
+                        {% elif oby == 'time' %}
+                        <i class="bi bi-alarm"></i>
+                        {% else %}
+                        <i class="bi bi-type-h1"></i>
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" role="button" onclick="submitOrder('updated')">
+                                <i class="bi bi-clock me-2"></i> Updated</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" role="button" onclick="submitOrder('created')">
+                                <i class="bi bi-clock-fill me-2"></i> Created</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" role="button" onclick="submitOrder('time')">
+                                <i class="bi bi-alarm me-2"></i> Time</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" role="button" onclick="submitOrder('title')">
+                                <i class="bi bi-type-h1 me-2"></i> Title
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% with desc_checked=asc|yesno:",checked" %}
+                <input type="radio" class="btn-check" name="asc" value="0" id="desc" autocomplete="off" onchange="this.form.submit()"{{ desc_checked }}>
+                {% endwith %}
+                <label class="btn btn-sm btn-outline-secondary" for="desc" data-placement="top" data-toggle="tooltip" title="desceding">
+                    <i class="bi bi-sort-alpha-down-alt"></i>
+                </label>
+                {% with asc_checked=asc|yesno:"checked," %}
+                <input type="radio" class="btn-check" name="asc" value="1" id="asc" autocomplete="off" onchange="this.form.submit()"{{ asc_checked }}>
+                {% endwith %}
+                <label class="btn btn-sm btn-outline-secondary" for="asc" data-placement="top" data-toggle="tooltip" title="ascending">
+                    <i class="bi bi-sort-alpha-down"></i>
+                </label>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</form>

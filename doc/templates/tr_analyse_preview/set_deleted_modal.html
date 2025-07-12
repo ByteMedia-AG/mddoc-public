@@ -1,0 +1,27 @@
+<!-- Search syntax modal -->
+<div aria-hidden="true" aria-labelledby="setDeletedModalLabel" class="modal fade" id="setDeletedModal" style="top: 70px;" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'doc-tr-set-deleted' %}">{% csrf_token %}
+                {% for key, value in request.POST.lists %}
+                {% if key != 'csrfmiddlewaretoken' %}
+                {% for v in value %}
+                <input type="hidden" name="{{ key }}" value="{{ v }}">
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="setDeletedModalLabel">Delete time records</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    Do you really want to delete all displayed entries?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" type="submit">Yes, proceed</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

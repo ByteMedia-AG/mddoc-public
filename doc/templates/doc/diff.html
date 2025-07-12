@@ -1,0 +1,25 @@
+{% if diff %}
+<div class="alert alert-info">
+    <div class="d-flex align-items-center position-relative" role="alert">
+        <div>
+            <i class="fs-4 bi-plus-slash-minus me-4"></i>
+        </div>
+        <div>
+            The content of this entry differs from the currently valid entity. Click in this area
+            to display the differences and also to hide them again.
+        </div>
+        <a class="stretched-link" data-bs-toggle="collapse" href="#collapseDiff" role="button" aria-expanded="false" aria-controls="collapseDiff">
+            <span class="visually-hidden"></span>
+        </a>
+    </div>
+    <div class="collapse" id="collapseDiff">
+        <div class="bg-black px-3 pt-4 pb-2 mb-3 mt-4 border rounded position-relative">
+            <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 copy-code" title="Copy to clipboard" type="button">copy</button>
+            <div class="codehilite">
+                <pre><code>{{ diff|escape }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+

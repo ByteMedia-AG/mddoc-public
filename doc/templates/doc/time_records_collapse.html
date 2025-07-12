@@ -1,0 +1,15 @@
+{% if time_records %}
+<div class="collapse" id="collapseTimeRecords">
+    <div class="py-4 px-4 border rounded mb-3">
+        <h2 class="h4 ms-3">Time records</h2>
+        <ul class="list-group list-group-flush">
+            {% for tr in time_records %}
+            <li class="list-group-item">
+                <small class="text-nowrap">{{ tr.date }} - {{ tr.time }} hours</small>
+                <div class="flex-fill">{{ tr.description }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}

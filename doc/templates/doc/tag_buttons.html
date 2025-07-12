@@ -1,0 +1,7 @@
+{% if tags %}
+<div class="d-flex flex-row mb-2">
+    {% for tag in tags %}
+    <a class="badge bg-transparent border text-secondary me-2 mb-2" style="text-decoration:none;" href="{% url 'docs' %}?search={{ '#'|add:tag.slug|urlencode }}">{{ tag.name }}</a>
+    {% endfor %}
+</div>
+{% endif %}

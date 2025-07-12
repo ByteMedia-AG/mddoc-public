@@ -1,0 +1,15 @@
+{% if log %}
+<div class="collapse" id="collapseLog">
+    <div class="py-4 px-4 border rounded mb-3">
+        <h2 class="h4 ms-3">Logs</h2>
+        <ul class="list-group list-group-flush">
+            {% for d, c in log %}
+            <li class="list-group-item">
+                <small class="text-nowrap">{{ d|date:"Y-m-d H:i" }}</small>
+                <div class="flex-fill">{{ c|linebreaksbr }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}

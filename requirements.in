@@ -1,0 +1,15 @@
+beautifulsoup4>=4.13
+Django>=5.2,<6.0
+django_crispy_forms>=2.4
+crispy-bootstrap5>=2022.1
+django_taggit>=6.1
+events>=0.5
+Faker>=37.4
+googlemaps>=4.10
+local>=1.0
+openpyxl>=3.1
+requests>=2.32
+selenium>=4.34
+webdriver_manager>=4.0
+markdown>=3.5
+Pygments>=2.17

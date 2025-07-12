@@ -1,0 +1,18 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="container border rounded p-3 mt-5" style="max-width: 400px;">
+  <h2>Login</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="id_username" class="form-label">Username</label>
+      <input type="text" name="username" class="form-control" required id="id_username">
+    </div>
+    <div class="mb-3">
+      <label for="id_password" class="form-label">Passphrase</label>
+      <input type="password" name="password" class="form-control" required id="id_password">
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+</div>
+{% endblock %}

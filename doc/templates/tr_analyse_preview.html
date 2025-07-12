@@ -1,0 +1,46 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+{% include 'tr_analyse_preview/navbar.html' %}
+<div class="container">
+    <div class="max-80-vh px-2 border rounded">
+        <table class="table table-hover table-striped">
+            <thead class="sticky-top">
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Item</th>
+                <th scope="col">Task</th>
+                <th class="text-end" scope="col">Hours</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in rows %}
+            <tr class="selectable-row">
+                <td class="text-nowrap">{{ row.date|date:"Y-m-d" }}</td>
+                <td>{{ row.doc__title }}</td>
+                <td>{{ row.description }}</td>
+                <td class="text-end">{{ row.time|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="selectable-row">
+                <td></td>
+                <td>Total</td>
+                <td></td>
+                <td class="text-end">{{ total|floatformat:2 }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include 'tr_analyse_preview/set_settled_modal.html' %}
+{% include 'tr_analyse_preview/set_deleted_modal.html' %}
+{% endblock content %}
+
+{% block extra_js%}
+{% include 'tr_analyse_preview/extra_js.html' %}
+{% endblock %}

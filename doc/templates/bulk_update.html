@@ -1,0 +1,205 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .btn-group .btn {
+        min-width: 150px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'bulk_update/navbar.html' %}
+<div class="container">
+    <h1 class="h2 mb-4">{{ page_title }}</h1>
+    {% if no_docs_left %}
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-info-circle-fill me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">No documents selected</h2>
+            <div>
+                You have selected either no documents or only revisions. After excluding
+                revised documents, there are no remaining entries that could be updated.
+                Please go back to the search and change or expand the selection.
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {% if show_initial_warning %}
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-exclamation-triangle-fill me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">No revisions / Immediate update</h2>
+            <div>
+                Please note that a bulk update - in contrast to individual processing -
+                does not create any revisions of the affected documents.
+                And the selected operation (adding/removing flags and tags) is performed
+                immediately after clicking the corresponding button and is applied to all
+                documents listed below.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if show_exclusion_deleted_info %}
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-info-circle-fill me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">No bulk update on revisions</h2>
+            <div>
+                Revisions cannot be updated as part of a bulk update. The documents you
+                selected with the status 'revision' have therefore been removed from the
+                list of affected documents.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-exclamation-octagon me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">An exception occurred</h2>
+            <ul>
+                {% for e in error %}
+                <li>{{ e }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-hand-thumbs-up me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">Update successful</h2>
+            <div>
+                The update has been successfully completed.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if show_delete_warning %}
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-info-circle-fill me-4"></i>
+        <div>
+            <h2 class="h5 mb-1">Archived / deleted</h2>
+            <div>
+                A document can either be archived or deleted, but not both at the same time.
+                If the 'Archive' action is executed, deleted documents are marked as not deleted
+                again. Conversely, when the 'Delete' action is performed, the affected documents
+                are automatically set to not archived.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <form class="mb-4 p-3 border rounded" method="post" action="{% url 'doc-bulk-update' %}">
+        {% csrf_token %}
+        {% for d in docs %}
+        <input type="hidden" name="doc" value="{{ d.id }}">
+        {% endfor %}
+        <h2 class="h4 mb-3">Operations to be applied</h2>
+        <div class="border rounded p-3 mb-3">
+            <h3 class="h6 mb-3">Set / Unset Archive and Flag</h3>
+            <div class="d-flex flex-row gap-4 mt-3">
+                <div aria-label="Set / unset flag" class="btn-group" role="group">
+                    <input autocomplete="off" class="btn-check" id="set-flag" name="set-flag" onchange="this.form.submit()" type="checkbox">
+                    <label class="btn btn-success text-start pe-3" for="set-flag">
+                        <i class="bi-flag-fill me-2"></i> Flag
+                    </label>
+                    <input autocomplete="off" class="btn-check" id="unset-flag" name="unset-flag" onchange="this.form.submit()" type="checkbox">
+                    <label class="btn btn-outline-success" for="unset-flag">
+                        <i class="bi-flag me-2"></i> Undo flag
+                    </label>
+                </div>
+                <div aria-label="Set / unset archived" class="btn-group" role="group">
+                    <input autocomplete="off" class="btn-check" id="set-archive" name="set-archived" onchange="this.form.submit()" type="checkbox">
+                    <label class="btn btn-info text-start pe-3" for="set-archive">
+                        <i class="bi-archive-fill me-2"></i> Archive
+                    </label>
+                    <input autocomplete="off" class="btn-check" id="unset-archived" name="unset-archived" onchange="this.form.submit()" type="checkbox">
+                    <label class="btn btn-outline-info" for="unset-archived">
+                        <i class="bi-archive me-2"></i> Undo archive
+                    </label>
+                </div>
+                <div aria-label="Delete / undelete" class="btn-group" role="group">
+                    <input autocomplete="off" class="btn-check" id="set-deleted" name="set-deleted" onchange="this.form.submit()" type="checkbox">
+                    <label class="btn btn-danger text-start pe-3" for="set-deleted">
+                        <i class="bi-trash-fill me-2"></i> Delete
+                    </label>
+                    <input autocomplete="off" class="btn-check" id="unset-deleted" name="unset-deleted" onchange="this.form.submit()" type="checkbox">
+                    <label class="btn btn-outline-danger" for="unset-deleted">
+                        <i class="bi-trash me-2"></i> Undo delete
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="border rounded p-3 mb-3">
+            <h3 class="h6 mb-3">Add tags</h3>
+            <div class="d-flex flex-row gap-3">
+                <input aria-label="add-tag" class="form-control shadow-none border" id="add-tag" name="add-tag" placeholder="Tags, comma-separated">
+                <button class="btn btn-secondary" type="submit">
+                    <span class="bi-plus-circle-fill"/>
+                </button>
+            </div>
+        </div>
+        {% if tags %}
+        <div class="border rounded p-3">
+            <h3 class="h6 mb-3">Remove one of the following tags</h3>
+            {% for tag in tags %}
+            <button class="btn btn-outline-secondary btn-sm my-2 mt-0 me-1" type="submit" name="rm-tag" value="{{ tag.id }}">
+                <span class="text-secondary-emphasis"><strong>{{ tag.slug|slice:":1"|upper }}</strong>{{ tag.slug|slice:"1:" }}</span>
+            </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </form>
+    <h2 class="h4 mb-3">Documents affected by updates</h2>
+    <div class="max-80-vh px-2 border rounded mb-4">
+        <table class="table table-hover table-striped">
+            <thead class="sticky-top">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">State</th>
+                <th scope="col">Title</th>
+                <th scope="col">Tags</th>
+                <th scope="col">Created</th>
+                <th scope="col">Updated</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for d in docs %}
+            <tr class="selectable-row">
+                <td>{{ d.id }}</td>
+                <td class="text-nowrap">
+                    {% if d.is_flagged %}
+                    <i class="bi-flag-fill text-success me-2"></i>
+                    {% else %}
+                    <i class="bi-flag me-1 text-success opacity-50 me-2"></i>
+                    {% endif %}
+                    {% if d.is_archived %}
+                    <i class="bi-archive-fill text-info me-2"></i>
+                    {% else %}
+                    <i class="bi-archive me-1 text-info opacity-50 me-2"></i>
+                    {% endif %}
+                    {% if d.deleted_at %}
+                    <i class="bi-trash-fill text-danger"></i>
+                    {% else %}
+                    <i class="bi-trash me-1 text-danger opacity-50"></i>
+                    {% endif %}
+                </td>
+                <td>{{ d.title }}</td>
+                <td>{{ d.tag }}</td>
+                <td class="text-nowrap">{{ d.created_at|date:"Y-m-d H:i" }}</td>
+                <td class="text-nowrap">{{ d.updated_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block extra_js%}
+{% endblock %}

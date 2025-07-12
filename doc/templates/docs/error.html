@@ -1,0 +1,17 @@
+<div class="alert alert-danger" role="alert">
+    The search term has led to the following error:
+    <b>
+        <pre class="ms-2 d-inline font-weight-bold">{{ error }}</pre>
+    </b>
+    <p class="mt-2">
+        Please note the full-text search syntax (the button can be found above).
+        Common causes of search errors are:
+    </p>
+    <ul>
+        <li>Search words that have <b>non-word letters</b> and are not enclosed in inverted commas.</li>
+        <li><b>Odd number of inverted commas</b> or empty text in inverted commas.</li>
+        <li><b>Non-closed brackets</b> or inverted commas.</li>
+        <li>The use of <b>AND</b>, <b>NOT</b>, <b>OR</b> and <b>NEAR</b> at the wrong place.</li>
+        <li>The use of the <b>wildcard (*)</b> at the <b>beginning of a phrase</b> (an * is only permitted at the end of words)</li>
+    </ul>
+</div>

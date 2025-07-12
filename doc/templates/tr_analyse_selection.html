@@ -1,0 +1,73 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<style>
+    .selectable-row {
+        cursor: pointer;
+    }
+    .selectable-row:hover {
+        background-color: #f0f0f0; /* hellgrauer Hover-Effekt */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-3 p-2 border rounded d-flex justify-content-between bg-body-tertiary">
+        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        <form>
+            {% for doc in docs %}
+            <input name="doc" type="hidden" value="{{ doc }}">
+            {% endfor %}
+            <div class="d-flex flex-row justify-content-end gap-2">
+                <div class="d-flex gap-2 align-items-end">
+                    <input class="form-control w-auto" id="dgte" max="{{ max_date|date:'Y-m-d' }}" min="{{ min_date|date:'Y-m-d' }}"
+                           name="dgte" required type="date" value="{{ dgte|date:'Y-m-d' }}">
+                    <input class="form-control w-auto" id="dlte" max="{{ max_date|date:'Y-m-d' }}" min="{{ min_date|date:'Y-m-d' }}"
+                           name="dlte" required type="date" value="{{ dlte|date:'Y-m-d' }}">
+                    <button class="btn btn-secondary" type="submit">
+                        <i class="bi bi-funnel"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <button class="btn btn-primary" form="selected-time-records" type="submit">
+            <i class="bi bi-chevron-double-right"></i>
+        </button>
+    </div>
+    <form id="selected-time-records" method="post" action="{% url 'doc-tr-analyse-preview' %}">{% csrf_token %}
+        <div class="max-80-vh px-2 border rounded">
+            <table class="table table-hover table-striped">
+                <thead class="sticky-top">
+                <tr>
+                    <th scope="col"><input checked id="select-all" type="checkbox"/></th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Task</th>
+                    <th class="text-end" scope="col">Hours</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for e in entities %}
+                <tr class="selectable-row">
+                    <th scope="row"><input checked class="row-checkbox" type="checkbox" name="tr" value="{{ e.id }}"/></th>
+                    <td class="text-nowrap">{{ e.date|date:"Y-m-d" }}</td>
+                    <td>{{ e.doc.title }}</td>
+                    <td>{{ e.description }}</td>
+                    <td class="text-end">{{ e.time|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block extra_js%}
+{% include 'tr_analyse_selection/extra_js.html' %}
+{% endblock %}

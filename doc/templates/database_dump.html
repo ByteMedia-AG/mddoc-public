@@ -1,0 +1,76 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between mb-3 border rounded bg-body-tertiary">
+        <div class="p-2 bd-highlight">
+            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back to search">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <h1 class="h2 mb-3 ms-2">{{ page_title }}</h1>
+    {% if success %}
+    <div class="alert alert-success" role="alert">
+        <ul>
+            {% for p in success %}
+            <li class="my-2">
+                {{ p }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        <ul>
+            {% for p in error %}
+            <li class="my-2">
+                {{ p }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    <div class="alert alert-info" role="alert">
+        Please note that if you want to search for database backups in the application,
+        you must explicitly display archived entries. Database backups are marked as
+        archived by default. Or use this
+        <a class="alert-link text-decoration-none" href="{% url 'docs' %}?search=+%23db-dump&iar=on">example search query</a>.
+    </div>
+    <form class="border rounded p-3" method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <h2 class="h5 mb-3">Storage location</h2>
+            <div>
+                The file system (db_backup directory) or the document management system can be
+                used as the storage location.
+                Creating a document has the advantage that the dump can be provided with meta
+                information and can therefore be taken into account in the search.
+            </div>
+        </div>
+        <div class="border rounded p-3">
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="target_filesystem" id="target_filesystem" checked>
+                <label class="form-check-label ms-2" for="target_filesystem">
+                    Save the dump in the file system (db_dumps)
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="target_rmdoc" id="target_rmdoc">
+                <label class="form-check-label ms-2" for="target_rmdoc">
+                    Save the dump in a document (marked as archived)
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Persist a database dump</button>
+    </form>
+</div>
+{% endblock content %}
+
+{% block extra_js %}{% endblock %}

@@ -1,0 +1,36 @@
+<!-- Search syntax modal -->
+<div aria-hidden="true" aria-labelledby="searchSyntaxModalLabel" class="modal fade" id="searchSyntaxModal" style="top: 70px;" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchSyntaxModalLabel">Full-text Query Syntax</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <pre><code>&lt;phrase&gt;    := string [*]
+&lt;phrase&gt;    := &lt;phrase&gt; + &lt;phrase&gt;
+&lt;neargroup&gt; := NEAR ( &lt;phrase&gt; &lt;phrase&gt; ... [, N] )
+&lt;query&gt;     := [ [-] &lt;colspec&gt; :] [^] &lt;phrase&gt;
+&lt;query&gt;     := [ [-] &lt;colspec&gt; :] &lt;neargroup&gt;
+&lt;query&gt;     := [ [-] &lt;colspec&gt; :] ( &lt;query&gt; )
+&lt;query&gt;     := &lt;query&gt; AND &lt;query&gt;
+&lt;query&gt;     := &lt;query&gt; OR &lt;query&gt;
+&lt;query&gt;     := &lt;query&gt; NOT &lt;query&gt;
+&lt;colspec&gt;   := colname
+&lt;colspec&gt;   := { title description text tag }</code></pre>
+                <div>
+                    <p>
+                        A comprehensive description of the syntax can be found here:
+                        <a class="text-decoration-none link-secondary align-items-center" href="https://www.sqlite.org/fts5.html#full_text_query_syntax" target="_blank">
+                            <i class="bi bi-link me-2"></i>
+                            Full-text Query Syntax (SQLite FTS5 Extension)
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between mb-3 border rounded bg-body-tertiary">
+        <div class="p-2 bd-highlight">
+            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back to search">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <h1 class="h2 mb-3">{{ page_title }}</h1>
+    {% if form %}
+    <div class="alert alert-warning" role="alert">
+        The database should always be backed up before the clean-up. The data manipulations carried out
+        as part of the clean-up are irreversible. If you have not yet made a dump, you should create
+        one <a class="alert-link text-decoration-none" href="{% url 'doc-dump-database' %}">here</a>.
+    </div>
+    <div class="alert alert-info" role="alert">
+        Cleaning up the database is of no practical benefit from the user's perspective. The search
+        discriminates against entries marked as deleted and previous revisions. However, these can
+        be included in the search if required. Cleansing therefore generally leads to a reduction
+        in the utility value.
+    </div>
+    {% endif %}
+    {% if faked %}
+    <div class="alert alert-danger" role="alert">
+        The data manipulations have not been executed. To actually change the data in the database,
+        the commit must be explicitly confirmed.
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success" role="alert">
+        {% for p in success %}
+        <div class="my-2">
+            {{ p }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {% for p in error %}
+        <div class="my-2">
+            {{ p }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if form %}
+    <form method="post" class="border rounded py-3 px-3">
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block extra_js %}{% endblock %}

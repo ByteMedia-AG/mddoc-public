@@ -1,0 +1,79 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+ }
+*:not(.codehilite):not(.codehilite *) {
+    font-family: "Quicksand", sans-serif;
+}
+main {
+    flex: 1;
+}
+.logo {
+    width: 40px;
+    color: red;
+  }
+ .card {
+    height: 100%;
+ }
+ .htCenter {
+    text-align: center;
+ }
+ .htRight {
+    text-align: right;
+ }
+.top-after-header {
+    top: 71px;
+}
+.max-80-vh {
+    max-height:80vh; overflow-y:scroll;
+}
+.max-75-vh {
+    max-height:75vh; overflow-y:scroll;
+}
+.max-60-vh {
+    max-height:60vh; overflow-y:scroll;
+}
+td.min {
+    width: 1%;
+    white-space: nowrap;
+}
+#btn-back-to-top {
+    position: fixed;
+    bottom: 45px;
+    right: 40px;
+    display: none;
+    z-index:10;
+}
+#nav-back-to-top {
+    display: none;
+}
+[data-bs-theme=light] .list-group-item.active {
+    background-color: rgba(0, 123, 255, 0.15);
+    border-color: rgba(0, 123, 255, 0.25);
+    color: #212529;
+}
+[data-bs-theme=dark] .list-group-item.active {
+    background-color: rgba(0, 123, 255, 0.15);
+    border-color: rgba(0, 123, 255, 0.25);
+}
+.editor-toolbar {
+    background-color: white;
+}
+#bd-theme.dropdown-toggle::after {
+  display: none !important;
+}
+#nav-user.dropdown-toggle::after {
+  display: none !important;
+}
+#utils.dropdown-toggle::after {
+  display: none !important;
+}
+.codehilite {
+    background: transparent !important;
+    font-family: Consolas, Menlo, Monaco, "Courier New", monospace !important;
+}
+:not(.codehilite) code {
+    font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+    font-size: 1em;
+}

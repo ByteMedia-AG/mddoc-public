@@ -1,0 +1,11 @@
+{% if is_deleted and not is_revised %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <div>
+        <i class="h3 bi-trash me-4"></i>
+    </div>
+    <div>
+        This resource is marked as deleted. Please note that the entries
+        marked as deleted will be irretrievably lost when the data is cleaned up.
+    </div>
+</div>
+{% endif %}

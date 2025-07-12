@@ -1,0 +1,104 @@
+<div class="d-flex justify-content-between mb-3 border rounded d-print-none bg-body-tertiary">
+    {% if is_deleted or is_revised %}
+    <div class="p-2 bd-highlight">
+        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        {% if is_revised %}
+        <a class="btn btn-secondary me-2" data-placement="top" data-toggle="tooltip" href="{% url 'doc-detail' successor_id %}" role="button" title="Back to current version">
+            <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    <div class="p-2 bd-highlight">
+        <a class="btn btn-danger" data-bs-target="#confirmRestoreModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Restore">
+            <i class="bi bi-layer-forward"></i>
+        </a>
+    </div>
+    {% else %}
+    <div class="p-2 bd-highlight">
+        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        {% if entity.uri|slice:":7" == "http://" or entity.uri|slice:":8" == "https://" %}
+        <a class="btn btn-secondary" data-toggle="tooltip" href="{% url 'doc-extract' doc_id %}" target="_blank" role="button" title="Show info about the URI">
+            <i class="bi bi-journal-arrow-down"></i>
+        </a>
+        {% endif %}
+    </div>
+    <div class="p-2 bd-highlight">
+        {% if revisions %}
+         <div class="btn-group me-2">
+             <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc-edit' doc_id %}" role="button" title="Edit">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <a class="btn btn-outline-primary" data-bs-target="#showRevisionsModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Show revisions">
+                <i class="bi bi-view-list"></i>
+            </a>
+        </div>
+        {% endif %}
+        {% if log %}
+        <div class="btn-group me-2">
+            <a class="btn btn-primary" data-bs-target="#addLogModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Add a log entry">
+                <i class="bi bi-clipboard-plus"></i>
+            </a>
+            <a class="btn btn-outline-primary" data-bs-toggle="collapse" href="#collapseLog" role="button" aria-expanded="false" aria-controls="collapseLog" data-toggle="tooltip" title="Show/hide logs">
+                <i class="bi bi-view-list"></i>
+            </a>
+        </div>
+        {% else %}
+        <a class="btn btn-primary me-2" data-bs-target="#addLogModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Add a log entry">
+            <i class="bi bi-clipboard-plus"></i>
+        </a>
+        {% endif %}
+        {% if time_records %}
+        <div class="btn-group me-2">
+            <a class="btn btn-primary" data-bs-target="#addTimeRecordModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Add a time record">
+                <i class="bi bi-clock-history"></i>
+            </a>
+            <a class="btn btn-outline-primary" data-bs-toggle="collapse" href="#collapseTimeRecords" role="button" aria-expanded="false" aria-controls="collapseTimeRecords" data-toggle="tooltip" title="Show/hide time records">
+                <i class="bi bi-view-list"></i>
+            </a>
+        </div>
+        {% else %}
+        <a class="btn btn-primary me-2" data-bs-target="#addTimeRecordModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Add a time record">
+            <i class="bi bi-clock-history"></i>
+        </a>
+        {% endif %}
+    </div>
+    <div class="p-2 bd-highlight">
+        <form method="post" action="{% url 'doc-toggle-flag' doc_id %}" style="display:inline;">
+            {% csrf_token %}
+            {% if entity.is_flagged %}
+            <button class="btn btn-success me-2" data-toggle="tooltip" href="" role="submit" title="Remove flag">
+                <i class="bi bi-flag-fill"></i>
+            </button>
+            {% else %}
+            <button class="btn btn-outline-success me-2" data-toggle="tooltip" href="" role="submit" title="Set flag">
+                <i class="bi bi-flag"></i>
+            </button>
+            {% endif %}
+        </form>
+        <form method="post" action="{% url 'doc-toggle-archive' doc_id %}" style="display:inline;">
+            {% csrf_token %}
+            {% if entity.is_archived %}
+            <button class="btn btn-info me-2" data-toggle="tooltip" href="" role="submit" title="Remove archive flag">
+                <i class="bi bi-archive"></i>
+            </button>
+            {% else %}
+            <button class="btn btn-outline-info me-2" data-toggle="tooltip" href="" role="submit" title="Set archive flag">
+                <i class="bi bi-archive"></i>
+            </button>
+            {% endif %}
+        </form>
+        <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc-edit' doc_id %}" role="button" title="Edit">
+            <i class="bi bi-pencil"></i>
+        </a>
+    </div>
+    <div class="p-2 bd-highlight">
+        <a class="btn btn-danger" data-bs-target="#confirmDeleteModal" data-bs-toggle="modal" data-toggle="tooltip" href="" role="button" title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>

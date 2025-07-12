@@ -1,0 +1,63 @@
+<script>
+    function appendTagAndSubmit(button) {
+        const searchInput = document.getElementById('id_search');
+        const form = document.getElementById('refined_search');
+        const tag = button.value.trim();
+        const currentSearch = searchInput.value.trim();
+        const terms = new Set(currentSearch.split(/\s+/));
+        terms.add(tag);
+        searchInput.value = Array.from(terms).join(" ");
+        form.submit();
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="search"]');
+        if (input) {
+            input.focus();
+            const length = input.value.length;
+            input.setSelectionRange(length, length);  // Cursor ans Ende setzen
+        }
+    });
+
+    document.querySelectorAll('.list-group-item input[type="checkbox"]').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const label = checkbox.closest('.list-group-item');
+            if (checkbox.checked) {
+                label.classList.add('active');
+            } else {
+                label.classList.remove('active');
+            }
+        });
+    });
+function submitOrder(value) {
+    document.getElementById('id_order_by').value = value;
+    document.getElementById('refined_search').submit();
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('id_search');
+    const tagContainer = document.getElementById('active-tags');
+
+    function renderTags() {
+        tagContainer.innerHTML = '';
+        const tags = (input.value.match(/#\S+/g) || []);
+        tags.forEach(tag => {
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-transparent border text-secondary me-2 mb-2';
+            badge.textContent = tag.slice(1);
+            badge.style.cursor = 'pointer';
+
+            badge.onclick = () => {
+                input.value = input.value.replace(tag, '').trim();
+                renderTags();
+                input.form.submit();
+            };
+            tagContainer.appendChild(badge);
+        });
+    }
+
+    renderTags();
+    input.addEventListener('input', renderTags);
+});
+</script>

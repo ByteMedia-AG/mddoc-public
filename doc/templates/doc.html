@@ -1,0 +1,146 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load tz %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if error == 404 %}
+    {% include 'doc/error.html' %}
+    {% else %}
+    {% include 'doc/navbar.html' %}
+    <div class="mt-4 mb-4 ms-2">
+        {% include 'doc/tag_buttons.html' %}
+        {% include 'doc/title_block.html' %}
+    </div>
+    {% include 'doc/is_deleted_warning.html' %}
+    {% include 'doc/is_revision_warning.html' %}
+    {% include 'doc/diff.html' %}
+    {% include 'doc/log_collapse.html' %}
+    {% include 'doc/time_records_collapse.html' %}
+    {% if entity.description and not entity.text %}
+    <div class="alert alert-secondary d-flex align-items-center" role="alert">
+        <div>
+            <i class="fs-4 bi-chat-right-quote me-4"></i>
+        </div>
+        <div>
+            {{ entity.description }}
+        </div>
+    </div>
+    {% endif %}
+    {% if entity.uri %}
+    <div class="alert alert-secondary d-flex align-items-center position-relative" role="alert">
+        {% if entity.uri|slice:":7" == "http://" or entity.uri|slice:":8" == "https://" or entity.uri|slice:":7" == "file://" %}
+        <div>
+            <i class="fs-4 bi-globe me-4"></i>
+        </div>
+        <div>{{ entity.uri }}
+        </div>
+        <a href="{{ entity.uri }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ entity.uri }}</span></a>
+        {% elif entity.uri|slice:":4" == "geo:" %}
+        <div>
+            <i class="fs-4 bi-geo-alt me-4"></i>
+        </div>
+        <div>{{ entity.uri }}
+            <a href="https://www.google.com/maps?q={{ entity.uri|slice:'4:' }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ entity.uri }}</span></a>
+        </div>
+        {% else %}
+        <div>
+            <i class="fs-4 bi-bookmark me-4"></i>
+        </div>
+        <div>{{ entity.uri }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if entity.file %}
+    <div class="alert alert-secondary d-flex align-items-center position-relative" role="alert">
+        <div>
+            <i class="fs-4 bi-file-earmark-arrow-down me-4"></i>
+        </div>
+        <div>{{ entity.file }}
+            <a href="{{ MEDIA_URL }}{{ entity.file }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ entity.file }}</span></a>
+        </div>
+    </div>
+    {% endif %}
+    {% if entity.text %}
+    {% if entity.is_markdown %}
+    <div class="mt-2 mb-3 border rounded px-3 pt-0 pb-1 text-secondary-emphasis">
+        <div class="mb-3" style="height:0px;"></div>
+        {{ html|safe }}
+    </div>
+    {% else %}
+    <div class="mt-2 mb-3 border rounded px-3 py-3 text-secondary-emphasis">
+        <pre class="font-monospace" style="white-space: pre-line;">{{ entity.text }}</pre>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% include 'doc/confirm_delete_modal.html' %}
+    {% include 'doc/confirm_restore_modal.html' %}
+    {% include 'doc/revisions_modal.html' %}
+    {% include 'doc/add_log_modal.html' %}
+    {% include 'doc/add_time_record_modal.html' %}
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+{% if show_form %}
+<script>
+    let markdownCheckbox = document.getElementById("id_is_markdown");
+    let textarea = document.getElementById("id_text");
+    let simplemde = null;
+
+    function initSimpleMDE() {
+       if (!simplemde) {
+          simplemde = new SimpleMDE({
+             element: textarea,
+             hideIcons: ["image", "guide", "preview"]
+          });
+       }
+    }
+
+    function destroySimpleMDE() {
+       if (simplemde) {
+          simplemde.toTextArea();
+          simplemde = null;
+       }
+    }
+
+    function toggleEditor() {
+       if (markdownCheckbox.checked) {
+          initSimpleMDE();
+       } else {
+          destroySimpleMDE();
+       }
+    }
+    toggleEditor();
+    markdownCheckbox.addEventListener("change", toggleEditor);
+</script>
+{% endif %}
+<script>
+    const form = document.getElementById("add-time-record-form");
+    if (form) {
+       form.addEventListener("submit", function(e) {
+          console.log("Submit event triggered");
+       });
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+       document.querySelectorAll(".copy-code").forEach(button => {
+          button.addEventListener("click", () => {
+             const codeBlock = button.nextElementSibling.querySelector("pre");
+             if (!codeBlock) return;
+             const text = codeBlock.innerText.trimEnd();
+             navigator.clipboard.writeText(text).then(() => {
+                button.innerText = "copied";
+                setTimeout(() => button.innerText = "copy", 2000);
+             });
+          });
+       });
+    });
+</script>
+{% endblock %}
