@@ -15,31 +15,9 @@ class SearchManager(models.Manager):
         """
         Match uses the FTS5 extension of SQLite. On other databases the method must be updated accordingly.
         Additonally the virtual table as well as the triggers must be applied beforehand.
-
-        -- Drop the index and the trigger
-        DROP TABLE IF EXISTS doc_doc_idx;
-        DROP TRIGGER IF EXISTS doc_doc_ai;
-        DROP TRIGGER IF EXISTS doc_doc_ad;
-        DROP TRIGGER IF EXISTS doc_doc_au;
-
-        -- Create the virtual table
-        CREATE VIRTUAL TABLE doc_doc_idx USING fts5(id, title, description, text, tag, uri, updated_at, deleted_at, is_archived, successor_id, time, created_at, file, is_flagged, last_settlement, has_unsettled_tr, content=doc_doc, content_rowid=id);
-
-        -- Initially populate the index
-        INSERT INTO doc_doc_idx (rowid, title, description, text, tag, uri, file) SELECT id, title, description, text, tag, uri, file FROM doc_doc;
-
-        -- Create the insert, delete and update triggers
-        CREATE TRIGGER doc_doc_ai AFTER INSERT ON doc_doc BEGIN
-            INSERT INTO doc_doc_idx(rowid, title, description, text, tag, uri, file) VALUES (new.id, new.title, new.description, new.text, new.tag, new.uri, new.file);
-        END;
-        CREATE TRIGGER doc_doc_ad AFTER DELETE ON doc_doc BEGIN
-          INSERT INTO doc_doc_idx(doc_doc_idx, rowid, title, description, text, tag, uri, file) VALUES('delete', old.id, old.title, old.description, old.text, old.tag, old.uri, old.file);
-        END;
-        CREATE TRIGGER doc_doc_au AFTER UPDATE ON doc_doc BEGIN
-          INSERT INTO doc_doc_idx(doc_doc_idx, rowid, title, description, text, tag, uri, file) VALUES('delete', old.id, old.title, old.description, old.text, old.tag, old.uri, old.file);
-          INSERT INTO doc_doc_idx(rowid, title, description, text, tag, uri, file) VALUES (new.id, new.title, new.description, new.text, new.tag, new.uri, new.file);
-        END;
         ---
+        /doc/management/commands/refresh_text_index.py
+        ./manage.py refresh_text_index.py
         """
 
         def repl_tag(m):
@@ -190,3 +168,13 @@ class TimeRecord(models.Model):
     settled_at = models.DateTimeField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(null=False, blank=True, auto_now_add=True, db_index=True)
     deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+
+class ChecklistItem(models.Model):
+    """
+    The model holds the checklist items.
+    """
+
+    doc = models.ForeignKey(Doc, null=False, blank=False, on_delete=models.CASCADE, related_name='checklist_items')
+    description = models.CharField(null=False, blank=False, max_length=255, verbose_name='Item description')
+    position = models.PositiveIntegerField(null=True, blank=True)

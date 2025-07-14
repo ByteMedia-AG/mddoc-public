@@ -1,11 +1,6 @@
 # MdDoc
-[![GitHub stars](https://img.shields.io/github/stars/ByteMedia-AG/mddoc-public.svg?style=social)](https://github.com/ByteMedia-AG/mddoc-public/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ByteMedia-AG/mddoc-public.svg?style=social)](https://github.com/ByteMedia-AG/mddoc-public/network)
-[![GitHub issues](https://img.shields.io/github/issues/ByteMedia-AG/mddoc-public.svg)](https://github.com/ByteMedia-AG/mddoc-public/issues)
-[![GitHub license](https://img.shields.io/github/license/ByteMedia-AG/mddoc-public.svg)](https://github.com/ByteMedia-AG/mddoc-public/blob/main/LICENSE)
-[![GitHub last commit](https://img.shields.io/github/last-commit/ByteMedia-AG/mddoc-public.svg)](https://github.com/ByteMedia-AG/mddoc-public/commits/main)
 
-## About MdDoc 
+## About MdDoc
 
 _MdDoc_ is a web-based application for creating, editing, and organizing documents in Markdown or plain text. Each document can include a title, description, tags, and an optional file attachment. The system tracks a full revision history: every change is saved, and archived documents additionally support versioning.
 
@@ -22,7 +17,7 @@ Follow these steps to set up the project in a local development environment.
 ### Setup
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/ByteMedia-AG/mddoc-public.git
+git clone https://github.com/your-username/your-project.git
 cd your-project
 ```
 #### 2. Create and activate a virtual environment
@@ -55,4 +50,3 @@ You can access the Django admin at:
 ```
 http://127.0.0.1:8000/admin/
 ```
-<!-- trigger license recognition -->
