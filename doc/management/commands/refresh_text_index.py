@@ -14,35 +14,35 @@ class Command(BaseCommand):
             """
             CREATE VIRTUAL TABLE doc_doc_idx USING fts5(
                 id, title, description, text, tag, uri, updated_at, deleted_at,
-                is_archived, successor_id, time, created_at, file,
+                is_archived, successor_id, time, created_at,
                 is_flagged, last_settlement, has_unsettled_tr,
                 content=doc_doc, content_rowid=id
             );
             """,
             """
             INSERT INTO doc_doc_idx (
-                rowid, title, description, text, tag, uri, file
+                rowid, title, description, text, tag, uri
             )
-            SELECT id, title, description, text, tag, uri, file FROM doc_doc;
+            SELECT id, title, description, text, tag, uri FROM doc_doc;
             """,
             """
             CREATE TRIGGER doc_doc_ai AFTER INSERT ON doc_doc BEGIN
-                INSERT INTO doc_doc_idx(rowid, title, description, text, tag, uri, file)
-                VALUES (new.id, new.title, new.description, new.text, new.tag, new.uri, new.file);
+                INSERT INTO doc_doc_idx(rowid, title, description, text, tag, uri)
+                VALUES (new.id, new.title, new.description, new.text, new.tag, new.uri);
             END;
             """,
             """
             CREATE TRIGGER doc_doc_ad AFTER DELETE ON doc_doc BEGIN
-                INSERT INTO doc_doc_idx(doc_doc_idx, rowid, title, description, text, tag, uri, file)
-                VALUES('delete', old.id, old.title, old.description, old.text, old.tag, old.uri, old.file);
+                INSERT INTO doc_doc_idx(doc_doc_idx, rowid, title, description, text, tag, uri)
+                VALUES('delete', old.id, old.title, old.description, old.text, old.tag, old.uri);
             END;
             """,
             """
             CREATE TRIGGER doc_doc_au AFTER UPDATE ON doc_doc BEGIN
-                INSERT INTO doc_doc_idx(doc_doc_idx, rowid, title, description, text, tag, uri, file)
-                VALUES('delete', old.id, old.title, old.description, old.text, old.tag, old.uri, old.file);
-                INSERT INTO doc_doc_idx(rowid, title, description, text, tag, uri, file)
-                VALUES (new.id, new.title, new.description, new.text, new.tag, new.uri, new.file);
+                INSERT INTO doc_doc_idx(doc_doc_idx, rowid, title, description, text, tag, uri)
+                VALUES('delete', old.id, old.title, old.description, old.text, old.tag, old.uri);
+                INSERT INTO doc_doc_idx(rowid, title, description, text, tag, uri)
+                VALUES (new.id, new.title, new.description, new.text, new.tag, new.uri);
             END;
             """
         ]

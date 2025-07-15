@@ -45,7 +45,6 @@ urlpatterns = [
                   path("doc/database/cleanup", views.cleanup_database, name="doc-cleanup-database"),
                   path("doc/database/dump", views.dump_database, name="doc-dump-database"),
                   path("doc/status/", views.status, name="doc-status"),
-                  path("doc/uploaddir/cleanup", views.cleanup_upload_directory, name="doc-cleanup-upload-directory"),
                   path("doc/update/bulk", views.bulk_update, name="doc-bulk-update"),
                   path("doc/add/short", views.doc_add_short, name="doc-add-short"),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

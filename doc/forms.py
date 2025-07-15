@@ -9,12 +9,17 @@ from .models import Doc, TimeRecord
 from .widgets import EasyMdeTextarea
 
 
+# Custom widget to allow multiple file selection
+class MultiFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
 class DocForm(forms.ModelForm):
     """"""
 
     class Meta:
         model = Doc
-        fields = ["title", "time", "is_archived", "uri", "file", "description", "is_markdown", "text", "tags", "last_settlement", ]
+        fields = ["title", "time", "is_archived", "uri", "description", "is_markdown", "text", "tags", "last_settlement", ]
         widgets = {
             "text": EasyMdeTextarea(attrs={"class": "textarea form-control"}),
         }
@@ -40,6 +45,17 @@ class DocForm(forms.ModelForm):
         self.fields["description"].help_text = None
         self.fields["text"].label = ""
 
+        if self.instance.pk and self.instance.files.exists():
+            self.fields["delete_files"] = forms.MultipleChoiceField(
+                label="Remove selected files",
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+                choices=[(str(f.id), f"{f.name} ({f.id})") for f in self.instance.files.all()],
+            )
+            show_delete_files = True
+        else:
+            show_delete_files = False
+
         self.helper = FormHelper()
         self.helper.add_input(Submit('submit', 'Save', css_class="btn btn-secondary"))
         self.helper.layout = Layout(
@@ -51,10 +67,19 @@ class DocForm(forms.ModelForm):
                 css_class="form-row",
             ),
             Row(
-                Column("uri", css_class="form-group col-md-5 mb-0"),
-                Column("file", css_class="form-group col-md-7 mb-0"),
+                Column("uri", css_class="form-group col-md-6 mb-0"),
+                Column(
+                    HTML("""
+                        <div class="form-group">
+                            <label for="id_upload" class="form-label">Select files</label>
+                            <input type="file" name="upload" id="id_upload" class="form-control" multiple>
+                        </div>
+                    """),
+                    css_class="form-group col-md-6 mb-0"
+                ),
                 css_class="form-row",
             ),
+            *([Div("delete_files", css_class="border rounded p-3")] if show_delete_files else []),
             Div(
                 "is_markdown",
                 css_class="mt-3"

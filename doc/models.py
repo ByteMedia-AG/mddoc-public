@@ -1,4 +1,7 @@
+import hashlib
+import mimetypes
 import re
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -63,13 +66,13 @@ class Doc(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
     successor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='predecessors')
-    time = models.DateTimeField(blank=True, null=True, db_index=True, verbose_name='Associated point in time', help_text='For emails, logs or results data.')
+    time = models.DateTimeField(blank=True, null=True, db_index=True, verbose_name='Assoc. point in time', help_text='For emails, logs or results data.')
     created_at = models.DateTimeField(null=False, blank=True, auto_now_add=True, db_index=True)
-    file = models.FileField(blank=True, null=True, max_length=255, upload_to='doc/%Y/%m', verbose_name='File')
     log = models.TextField(blank=True, null=True, verbose_name='Log')  # Holds the log entries as a delimited string.
     is_flagged = models.BooleanField(null=False, blank=False, verbose_name="Is flagged", default=False, db_index=True)
     last_settlement = models.DateField(blank=True, null=True, db_index=True, verbose_name='Last settlement', help_text='Date of the last settlement of outstanding hours')
     has_unsettled_tr = models.BooleanField(null=False, default=False, verbose_name='Has unsettled time records')
+    files = models.ManyToManyField('File', blank=True, related_name='docs', verbose_name='Linked files')
 
     objects = SearchManager()
 
@@ -100,6 +103,7 @@ class Doc(models.Model):
             revision.deleted_at = timezone.now()
         revision.successor = self
         revision.save()
+        revision.files.set(self.files.all())
 
     def restore_revision(self):
         """
@@ -118,13 +122,15 @@ class Doc(models.Model):
         successor.is_markdown = self.is_markdown
         successor.is_archived = self.is_archived
         successor.uri = self.uri
-        successor.file = self.file
         successor.time = self.time
         successor.deleted_at = None
         successor.save()
+        successor.files.set(self.files.all())
 
     def delete(self, *args, **kwargs):
-        """"""
+        """
+        Removes the entry from the database.
+        """
 
         for predecessor in self.predecessors.all():
             predecessor.delete()
@@ -155,6 +161,33 @@ class Doc(models.Model):
         ]
 
 
+class File(models.Model):
+    """
+    Single file.
+    """
+
+    name = models.CharField(blank=True, null=True, max_length=255, verbose_name='Filename')
+    file = models.FileField(blank=True, null=True, max_length=255, upload_to='doc/%Y/%m', verbose_name='File')
+    size = models.PositiveIntegerField(blank=True, null=True)
+    mime_type = models.CharField(blank=True, null=True, max_length=255)
+    extension = models.CharField(blank=True, null=True, max_length=20)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    sha256 = models.CharField(blank=True, null=True, max_length=64)
+
+    def save(self, *args, **kwargs):
+        if self.file and not self.size:
+            self.size = self.file.size
+            self.extension = Path(self.file.name).suffix.lower().lstrip('.')
+            self.mime_type = mimetypes.guess_type(self.file.name)[0]
+
+            hasher = hashlib.sha256()
+            for chunk in self.file.chunks():
+                hasher.update(chunk)
+            self.sha256 = hasher.hexdigest()
+
+        super().save(*args, **kwargs)
+
+
 class TimeRecord(models.Model):
     """
     The model represents a time record with a relation to a document it belongs to.
@@ -178,3 +211,4 @@ class ChecklistItem(models.Model):
     doc = models.ForeignKey(Doc, null=False, blank=False, on_delete=models.CASCADE, related_name='checklist_items')
     description = models.CharField(null=False, blank=False, max_length=255, verbose_name='Item description')
     position = models.PositiveIntegerField(null=True, blank=True)
+    checked = models.BooleanField(null=False, blank=True, default=False, db_default=False)

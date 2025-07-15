@@ -17,7 +17,6 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.contenttypes.models import ContentType
-from django.core.files.base import File
 from django.db import connection
 from django.db.models import Min, Max
 from django.db.models import Subquery
@@ -36,7 +35,12 @@ from taggit.models import Tag, TaggedItem
 from .forms import DocForm, TimeRecordForm, CleanupForm
 from .markdown import md2html
 from .models import Doc, TimeRecord
+from .models import File
 from .utils import extract_selected_info_from_url
+from django.core.files import File as DjangoFile
+import traceback
+from pathlib import Path
+from django.db.models import Count
 
 
 def get_tags_grouped(tags):
@@ -580,6 +584,9 @@ def doc_add(request, **kwargs):
         form = DocForm(request.POST, request.FILES)
         if form.is_valid():
             entity = form.save()
+            for uploaded_file in request.FILES.getlist("upload"):
+                file_obj = File.objects.create(file=uploaded_file, name=uploaded_file.name)
+                entity.files.add(file_obj)
             entity.tag = " ".join(list(entity.tags.slugs()))
             entity.save()
             return HttpResponseRedirect(reverse("doc-detail", args=(entity.id,)))
@@ -700,11 +707,20 @@ def doc_edit(request, **kwargs):
 
     if request.method == 'POST':
         form = DocForm(request.POST, request.FILES, instance=entity)
+        print(request.FILES)
+        print(request.FILES.getlist("upload"))
+        print(form.errors)
         if form.is_valid():
             entity.make_revision()
             entity = form.save()
+            for uploaded_file in request.FILES.getlist("upload"):
+                file_obj = File.objects.create(file=uploaded_file, name=uploaded_file.name)
+                entity.files.add(file_obj)
             entity.is_archived = False
             entity.tag = " ".join(list(entity.tags.slugs()))
+            delete_ids = form.cleaned_data.get("delete_files", [])
+            if delete_ids:
+                entity.files.remove(*File.objects.filter(id__in=delete_ids))
             entity.save()
             return HttpResponseRedirect(reverse("doc-detail", args=(entity.id,)))
     else:
@@ -847,6 +863,7 @@ def doc(request, **kwargs):
         'revisions': entity.predecessors.order_by('updated_at').reverse(),
         'diff': diff,
         'log': log,
+        'files': entity.files.all().order_by('name'),
         'time_record_form': TimeRecordForm(),
         'time_records': list(entity.time_records.all().order_by('-date')) if entity.time_records.exists() else False,
     })
@@ -1040,7 +1057,13 @@ def dump_database(request, **kwargs):
                             description=f'This is an automatically created entry from a database backup. The dump was created {datetime_string}.',
                         )
                         doc.tags.add("db-dump")
-                        doc.file.save(backup_filename, File(f))
+                        django_file = DjangoFile(f)
+                        django_file.name = Path(backup_filename).name
+                        file_obj = File.objects.create(
+                            file=django_file,
+                            name=Path(backup_filename).name
+                        )
+                        doc.files.add(file_obj)
                         doc.save()
                         success.append(f"The database dump has been saved as document: {doc.title}")
                     if save_as_file:
@@ -1052,7 +1075,8 @@ def dump_database(request, **kwargs):
                         success.append(f"The database dump has been saved to: {backup_path}")
                     os.remove(tmp_path)
             except Exception as e:
-                error.append(f"An exception occurred:", e)
+                traceback.print_exc()
+                error.append(f"An exception occurred: {e}")
 
     return TemplateResponse(request, "database_dump.html", {
         'page_title': "Database dump",
@@ -1070,14 +1094,16 @@ def status(request, **kwargs):
     doc_time = {}
     trs = {}
     trs_time = {}
+    file = {}
 
     docs['All'] = Doc.objects.all().count()
     docs['Current'] = Doc.objects.filter(
         deleted_at__isnull=True, is_archived=False).count()
     docs['Current, with unsettled time records'] = TimeRecord.objects.filter(
-        settled_at__isnull=True, deleted_at__isnull=True, doc__deleted_at__isnull=True, doc__is_archived=False).values_list('doc_id', flat=True).distinct().count()
-    docs['Current, with file attachment'] = Doc.objects.filter(
-        deleted_at__isnull=True, is_archived=False, file__isnull=False).count()
+        settled_at__isnull=True, deleted_at__isnull=True,
+        doc__deleted_at__isnull=True, doc__is_archived=False).values_list('doc_id', flat=True).distinct().count()
+    docs['Current, with file attachment'] = Doc.objects.annotate(num_files=Count('files')).filter(
+        deleted_at__isnull=True, is_archived=False, num_files__gt=0).count()
     docs['Archived'] = Doc.objects.filter(
         deleted_at__isnull=True, is_archived=True).count()
     docs['Versions'] = Doc.objects.filter(
@@ -1100,6 +1126,9 @@ def status(request, **kwargs):
         deleted_at__isnull=False
     ).count()
 
+    file['All'] = File.objects.all().count()
+    file['Orphaned'] = File.objects.filter(docs__isnull=True).count()
+
     trs_time['Youngest'] = TimeRecord.objects.aggregate(Max('created_at'))['created_at__max']
     trs_time['Oldest'] = TimeRecord.objects.aggregate(Min('created_at'))['created_at__min']
 
@@ -1116,73 +1145,6 @@ def status(request, **kwargs):
         'doc_time': doc_time,
         'trs': trs,
         'trs_time': trs_time,
+        'file': file,
         'settings': flat_settings,
-    })
-
-
-@login_required
-@permission_required("doc.cleanup_upload_directory")
-def cleanup_upload_directory(request, **kwargs):
-    """Allows a cleanup of the upload directory to be made."""
-
-    error = []
-    success = []
-
-    if request.method == 'POST' and len(request.POST.getlist('file')) > 0:
-        if request.POST.get('confirmed', default=False):
-            base_dir = settings.MEDIA_ROOT
-            selected_files = request.POST.getlist('file')
-            now_str = timezone.now().strftime("%Y%m%d_%H%M%S")
-            trash_dir = os.path.join(settings.BASE_DIR, "trash")
-            os.makedirs(trash_dir, exist_ok=True)
-            zip_filename = f"deleted_files_{now_str}.zip"
-            zip_path = os.path.join(trash_dir, zip_filename)
-            with zipfile.ZipFile(zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
-                for rel_path in selected_files:
-                    abs_path = os.path.join(base_dir, rel_path)
-                    if os.path.isfile(abs_path):
-                        zipf.write(abs_path, arcname=rel_path)
-            for rel_path in selected_files:
-                abs_path = os.path.join(base_dir, rel_path)
-                if os.path.isfile(abs_path):
-                    os.remove(abs_path)
-                    success.append(f'The file {rel_path} has been deleted')
-            success.append(f'{len(selected_files)} files were archived in {zip_filename} and then removed')
-        else:
-            error.append('The confirmation checkbox has not been checked.')
-    elif request.method == 'POST':
-        error.append('No files have been selected (empty list)')
-
-    # Referenced files
-    used_files_all = list(Doc.objects.filter(
-        file__isnull=False).exclude(file='').distinct().values_list('file', flat=True))
-    used_files_wo_deleted = list(Doc.objects.filter(
-        file__isnull=False).exclude(file='').exclude(
-        deleted_at__isnull=False, successor__isnull=True).exclude(
-        successor__isnull=False, successor__deleted_at__isnull=False).distinct().values_list('file', flat=True))
-    used_files_wo_revisions = list(Doc.objects.exclude(file='').filter(
-        file__isnull=False, deleted_at__isnull=True).distinct().values_list('file', flat=True))
-
-    # Existing files
-    upload_dir = settings.MEDIA_ROOT
-    all_file_paths = []
-    for root, dirs, files in os.walk(upload_dir):
-        for filename in files:
-            file_path = os.path.join(root, filename)
-            all_file_paths.append(file_path)
-    existing_paths = [os.path.relpath(p, upload_dir) for p in all_file_paths]
-
-    # Unused files
-    unused_files_all = [p for p in existing_paths if p not in used_files_all]
-    unused_files_wo_deleted = [p for p in existing_paths if p not in used_files_wo_deleted]
-    unused_files_wo_revisions = [p for p in existing_paths if p not in used_files_wo_revisions]
-
-    return TemplateResponse(request, "cleanup_filesystem.html", {
-        'page_title': "Cleanup Upload Directory",
-        'unused_files': unused_files_all if len(unused_files_all) > 0 else False,
-        'unused_files_wo_deleted': len(unused_files_wo_deleted),
-        'unused_files_wo_revisions': len(unused_files_wo_revisions),
-        'upload_dir': upload_dir,
-        'error': error,
-        'success': success,
     })

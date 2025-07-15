@@ -2,6 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% load tz %}
+{% load file_filters %}
 
 {% block extra_css %}
 <link href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" rel="stylesheet">
@@ -56,13 +57,33 @@
         {% endif %}
     </div>
     {% endif %}
-    {% if entity.file %}
-    <div class="alert alert-secondary d-flex align-items-center position-relative" role="alert">
+    {% if files %}
+    <div class="alert alert-secondary d-flex align-items-start position-relative" role="alert">
         <div>
             <i class="fs-4 bi-file-earmark-arrow-down me-4"></i>
         </div>
-        <div>{{ entity.file }}
-            <a href="{{ MEDIA_URL }}{{ entity.file }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ entity.file }}</span></a>
+        <div class="d-flex flex-fill">
+            <ul class="list-group list-group-flush bg-transparent w-100">
+                {% for f in files %}
+                <li class="list-group-item bg-transparent">
+                    <div class="d-flex flex-row">
+                        <div class="flex-fill position-relative font-monospace text-secondary">
+                            <small><strong>{{ f.name }}</strong></small>
+                            <a href="{{ MEDIA_URL }}{{ f.file }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ f.file }}</span></a>
+                        </div>
+                        <div class="me-4 text-end text-secondary" style="width: 8%;">
+                            <small>ID {{ f.id }}</small>
+                        </div>
+                        <div class="me-4 text-end text-secondary" style="width: 16%;">
+                            <small>{{ f.mime_type|truncatechars:18 }}</small>
+                        </div>
+                        <div class="text-end text-nowrap text-secondary" style="width: 8%;">
+                            <small>{{ f.size|filesize_mb }}</small>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
     {% endif %}

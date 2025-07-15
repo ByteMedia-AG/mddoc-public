@@ -52,8 +52,12 @@ def md2html(md_text):
     for bq in soup.find_all('blockquote'):
         bq['class'] = 'blockquote'
 
-    # Bootstrap-kompatible Tabellen anpassen
     for table in soup.find_all('table'):
+        wrapper = soup.new_tag('div', **{'class': 'max-80-vh position-relative'})
+        table.wrap(wrapper)
+        thead = table.find('thead')
+        if thead:
+            thead['class'] = thead.get('class', []) + ['sticky-top']
         table['class'] = 'table'
 
     html = str(soup)
