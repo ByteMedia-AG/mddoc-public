@@ -93,7 +93,7 @@
         </div>
     </div>
     {% endif %}
-    <form class="mb-4 p-3 border rounded" method="post" action="{% url 'doc-bulk-update' %}">
+    <form class="mb-4 p-3 border rounded" method="post" action="{% url 'doc:bulk-update' %}">
         {% csrf_token %}
         {% for d in docs %}
         <input type="hidden" name="doc" value="{{ d.id }}">

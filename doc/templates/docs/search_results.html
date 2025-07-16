@@ -1,6 +1,6 @@
 <div class="list-group mb-4">
     {% for t in entities %}
-    <a class="list-group-item list-group-item-action flex-column align-items-start p-0" href="{% url 'doc-detail' t.id %}">
+    <a class="list-group-item list-group-item-action flex-column align-items-start p-0" href="{% url 'doc:detail' t.id %}">
         <div class="position-relative py-3 px-3">
             <div class="position-relative z-1 bg-transparent d-flex w-100 justify-content-between">
                 <div class="d-flex align-items-start">

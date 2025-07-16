@@ -185,7 +185,7 @@ def time_add(request, **kwargs):
     doc_id = kwargs.get('doc_id')
 
     if request.method != 'POST':
-        return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
     try:
         doc = Doc.objects.get(pk=doc_id)
@@ -203,7 +203,7 @@ def time_add(request, **kwargs):
         time_record.save()
         doc.save()
 
-    return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+    return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
 
 @login_required
@@ -589,7 +589,7 @@ def doc_add(request, **kwargs):
                 entity.files.add(file_obj)
             entity.tag = " ".join(list(entity.tags.slugs()))
             entity.save()
-            return HttpResponseRedirect(reverse("doc-detail", args=(entity.id,)))
+            return HttpResponseRedirect(reverse("doc__detail", args=(entity.id,)))
     else:
         form = DocForm()
 
@@ -617,7 +617,7 @@ def doc_extract(request, **kwargs):
         })
 
     if not entity.uri:
-        return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
     extracted_data = extract_selected_info_from_url(entity.uri)
 
@@ -639,7 +639,7 @@ def doc_delete(request, **kwargs):
 
     if request.method != 'POST':
         # In case of a GET request, a redirect to the corresponding details view is done.
-        return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
     try:
         entity = Doc.objects.get(pk=doc_id)
@@ -664,7 +664,7 @@ def doc_restore(request, **kwargs):
 
     if request.method != 'POST':
         # In case of a GET request, a redirect to the corresponding details view is done.
-        return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
     try:
         entity = Doc.objects.get(pk=doc_id)
@@ -677,12 +677,12 @@ def doc_restore(request, **kwargs):
 
     if entity.successor:
         entity.restore_revision()
-        return HttpResponseRedirect(reverse("doc-detail", args=(entity.successor.id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(entity.successor.id,)))
     else:
         # The deleted attribute has to be set to None
         entity.deleted_at = None
         entity.save()
-        return HttpResponseRedirect(reverse("doc-detail", args=(entity.id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(entity.id,)))
 
 
 @login_required
@@ -722,7 +722,7 @@ def doc_edit(request, **kwargs):
             if delete_ids:
                 entity.files.remove(*File.objects.filter(id__in=delete_ids))
             entity.save()
-            return HttpResponseRedirect(reverse("doc-detail", args=(entity.id,)))
+            return HttpResponseRedirect(reverse("doc__detail", args=(entity.id,)))
     else:
         form = DocForm(instance=entity)
     return TemplateResponse(request, "doc-edit.html", {
@@ -745,7 +745,7 @@ def doc_add_log(request, **kwargs):
         log_entry = BeautifulSoup(log_entry, features="html.parser").get_text()
 
     if request.method != 'POST' or log_entry == '':
-        return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+        return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
     try:
         entity = Doc.objects.get(pk=doc_id)
@@ -764,7 +764,7 @@ def doc_add_log(request, **kwargs):
     entity.log = log_entry
     entity.save()
 
-    return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+    return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
 
 @login_required
@@ -788,7 +788,7 @@ def doc_toggle_archive(request, **kwargs):
             'error': 404,
         })
 
-    return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+    return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
 
 @login_required
@@ -812,7 +812,7 @@ def doc_toggle_flag(request, **kwargs):
             'error': 404,
         })
 
-    return HttpResponseRedirect(reverse("doc-detail", args=(doc_id,)))
+    return HttpResponseRedirect(reverse("doc__detail", args=(doc_id,)))
 
 
 @login_required

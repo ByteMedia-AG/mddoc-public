@@ -1,7 +1,7 @@
 <div class="container">
     <div class="d-flex justify-content-between mb-3 border rounded bg-body-tertiary">
         <div class="p-2 bd-highlight">
-            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}?cancel" role="button" title="Reset search">
+            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'doc:home' %}?cancel" role="button" title="Reset search">
                 <i class="bi bi-x-lg"></i>
             </a>
             <a class="btn btn-secondary" data-bs-target="#searchSyntaxModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Show search syntax">
@@ -12,7 +12,7 @@
             <a class="btn btn-secondary me-2" data-bs-target="#addLogEntryModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Add a short entry">
                 <i class="bi bi-plus-circle-dotted"></i>
             </a>
-            <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc-add' %}" role="button" title="Add new document">
+            <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc:add' %}" role="button" title="Add new document">
                 <i class="bi bi-plus-circle"></i>
             </a>
         </div>

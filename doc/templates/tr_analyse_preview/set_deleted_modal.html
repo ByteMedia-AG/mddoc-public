@@ -2,7 +2,7 @@
 <div aria-hidden="true" aria-labelledby="setDeletedModalLabel" class="modal fade" id="setDeletedModal" style="top: 70px;" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{% url 'doc-tr-set-deleted' %}">{% csrf_token %}
+            <form method="post" action="{% url 'doc:tr-set-deleted' %}">{% csrf_token %}
                 {% for key, value in request.POST.lists %}
                 {% if key != 'csrfmiddlewaretoken' %}
                 {% for v in value %}

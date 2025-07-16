@@ -1,11 +1,11 @@
 <div class="d-flex justify-content-between mb-3 border rounded d-print-none bg-body-tertiary">
     {% if is_deleted or is_revised %}
     <div class="p-2 bd-highlight">
-        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back">
+        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'doc:home' %}" role="button" title="Back">
             <i class="bi bi-chevron-double-left"></i>
         </a>
         {% if is_revised %}
-        <a class="btn btn-secondary me-2" data-placement="top" data-toggle="tooltip" href="{% url 'doc-detail' successor_id %}" role="button" title="Back to current version">
+        <a class="btn btn-secondary me-2" data-placement="top" data-toggle="tooltip" href="{% url 'doc:detail' successor_id %}" role="button" title="Back to current version">
             <i class="bi bi-box-arrow-up-right"></i>
         </a>
         {% endif %}
@@ -17,11 +17,11 @@
     </div>
     {% else %}
     <div class="p-2 bd-highlight">
-        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back">
+        <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'doc:home' %}" role="button" title="Back">
             <i class="bi bi-chevron-double-left"></i>
         </a>
         {% if entity.uri|slice:":7" == "http://" or entity.uri|slice:":8" == "https://" %}
-        <a class="btn btn-secondary" data-toggle="tooltip" href="{% url 'doc-extract' doc_id %}" target="_blank" role="button" title="Show info about the URI">
+        <a class="btn btn-secondary" data-toggle="tooltip" href="{% url 'doc:extract' doc_id %}" target="_blank" role="button" title="Show info about the URI">
             <i class="bi bi-journal-arrow-down"></i>
         </a>
         {% endif %}
@@ -29,7 +29,7 @@
     <div class="p-2 bd-highlight">
         {% if revisions %}
          <div class="btn-group me-2">
-             <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc-edit' doc_id %}" role="button" title="Edit">
+             <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc:edit' doc_id %}" role="button" title="Edit">
                 <i class="bi bi-pencil"></i>
             </a>
             <a class="btn btn-outline-primary" data-bs-target="#showRevisionsModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Show revisions">
@@ -67,7 +67,7 @@
         {% endif %}
     </div>
     <div class="p-2 bd-highlight">
-        <form method="post" action="{% url 'doc-toggle-flag' doc_id %}" style="display:inline;">
+        <form method="post" action="{% url 'doc:toggle-flag' doc_id %}" style="display:inline;">
             {% csrf_token %}
             {% if entity.is_flagged %}
             <button class="btn btn-success me-2" data-toggle="tooltip" href="" role="submit" title="Remove flag">
@@ -79,7 +79,7 @@
             </button>
             {% endif %}
         </form>
-        <form method="post" action="{% url 'doc-toggle-archive' doc_id %}" style="display:inline;">
+        <form method="post" action="{% url 'doc:toggle-archive' doc_id %}" style="display:inline;">
             {% csrf_token %}
             {% if entity.is_archived %}
             <button class="btn btn-info me-2" data-toggle="tooltip" href="" role="submit" title="Remove archive flag">
@@ -91,7 +91,7 @@
             </button>
             {% endif %}
         </form>
-        <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc-edit' doc_id %}" role="button" title="Edit">
+        <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc:edit' doc_id %}" role="button" title="Edit">
             <i class="bi bi-pencil"></i>
         </a>
     </div>

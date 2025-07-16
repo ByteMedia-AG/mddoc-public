@@ -11,7 +11,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
-                <form action="{% url 'doc-restore' doc_id %}" method="post">
+                <form action="{% url 'doc:restore' doc_id %}" method="post">
                     {% csrf_token %}
                     <button class="btn btn-danger" type="submit">Yes, restore</button>
                 </form>

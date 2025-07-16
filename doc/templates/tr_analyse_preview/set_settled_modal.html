@@ -2,7 +2,7 @@
 <div aria-hidden="true" aria-labelledby="setSettledModalLabel" class="modal fade" id="setSettledModal" style="top: 70px;" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{% url 'doc-tr-set-settled' %}">{% csrf_token %}
+            <form method="post" action="{% url 'doc:tr-set-settled' %}">{% csrf_token %}
                 {% for key, value in request.POST.lists %}
                 {% if key != 'csrfmiddlewaretoken' %}
                 {% for v in value %}

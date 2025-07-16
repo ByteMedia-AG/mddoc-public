@@ -7,7 +7,7 @@
 <div class="container">
     <div class="d-flex justify-content-between mb-3 border rounded bg-body-tertiary">
         <div class="p-2 bd-highlight">
-            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'docs' %}" role="button" title="Back to search">
+            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'doc:home' %}" role="button" title="Back to search">
                 <i class="bi bi-chevron-double-left"></i>
             </a>
         </div>
@@ -41,7 +41,7 @@
         Please note that if you want to search for database backups in the application,
         you must explicitly display archived entries. Database backups are marked as
         archived by default. Or use this
-        <a class="alert-link text-decoration-none" href="{% url 'docs' %}?search=+%23db-dump&iar=on">example search query</a>.
+        <a class="alert-link text-decoration-none" href="{% url 'doc:home' %}?search=+%23db-dump&iar=on">example search query</a>.
     </div>
     <form class="border rounded p-3" method="post">
         {% csrf_token %}

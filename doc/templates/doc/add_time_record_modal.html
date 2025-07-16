@@ -7,7 +7,7 @@
                 <h5 class="modal-title" id="addTimeRecordModalLabel">Add a time record</h5>
                 <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
-            <form id="add-time-record-form" method="post" action="{% url 'doc-time-add' doc_id %}">{% csrf_token %}
+            <form id="add-time-record-form" method="post" action="{% url 'doc:time-add' doc_id %}">{% csrf_token %}
                 <div class="modal-body">
                     {{ time_record_form|crispy }}
                 </div>

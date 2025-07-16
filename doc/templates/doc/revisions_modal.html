@@ -20,7 +20,7 @@
                         <tbody>
                         {% for t in revisions %}
                         <tr class="position-relative">
-                            <td class="min">{{ t.id }}<a class="stretched-link" href="{% url 'doc-detail' t.id %}?{{ request.GET.urlencode }}"><span class="visually-hidden">{{ t.id }}</span></a></td>
+                            <td class="min">{{ t.id }}<a class="stretched-link" href="{% url 'doc:detail' t.id %}?{{ request.GET.urlencode }}"><span class="visually-hidden">{{ t.id }}</span></a></td>
                             <td>{{ t.title }}</td>
                             <td class="min">{{ t.updated_at }}</td>
                         </tr>
