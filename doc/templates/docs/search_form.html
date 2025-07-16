@@ -47,7 +47,7 @@
         </div>
     </div>
     {% if tags %}
-    <div class="mt-3">
+    <div class="mt-3 max-33-vh">
         {% for first_letter, tag_group in tags %}
         <div class="btn-group mb-2 me-2" role="group" aria-label="Tag group {{ first_letter }}">
             <button class="btn btn-secondary btn-sm disabled opacity-75" type="button">
@@ -71,14 +71,14 @@
             {% endwith %}
             <label class="btn btn-sm btn-outline-success text-start pe-lg-4" for="flg" data-placement="top" data-toggle="tooltip" title="Filter flagged docs">
                 <i class="bi-flag me-0 me-lg-2"></i>
-                <span class="d-none d-lg-inline">FLAG</span>
+                <span class="d-none d-lg-inline">FLG</span>
             </label>
             {% with iar_checked=params.iar|yesno:'checked,' %}
             <input autocomplete="off" class="btn-check" id="iar" name="iar" onchange="this.form.submit()" type="checkbox" {{iar_checked}}>
             {% endwith %}
             <label class="btn btn-sm btn-outline-info text-start pe-lg-4" for="iar" data-placement="top" data-toggle="tooltip" title="Include archived docs">
                 <i class="bi-archive me-lg-2"></i>
-                <span class="d-none d-lg-inline">ARCH</span>
+                <span class="d-none d-lg-inline">ARC</span>
             </label>
             {% with idr_checked=params.idr|yesno:'checked,' %}
             <input autocomplete="off" class="btn-check" id="idr" name="idr" onchange="this.form.submit()" type="checkbox" {{idr_checked}}>
@@ -93,6 +93,13 @@
             <label class="btn btn-sm btn-outline-warning text-start pe-lg-4" for="ipr" data-placement="top" data-toggle="tooltip" title="Include revisions">
                 <i class="bi-arrow-counterclockwise me-lg-2"></i>
                 <span class="d-none d-lg-inline">REV</span>
+            </label>
+            {% with ddl_checked=params.ddl|yesno:'checked,' %}
+            <input autocomplete="off" class="btn-check" id="ddl" name="ddl" onchange="this.form.submit()" type="checkbox" {{ddl_checked}}>
+            {% endwith %}
+            <label class="btn btn-sm btn-outline-primary text-start pe-lg-4" for="ddl" data-placement="top" data-toggle="tooltip" title="Filter deadlines">
+                <i class="bi-stopwatch me-lg-2"></i>
+                <span class="d-none d-lg-inline">DUE</span>
             </label>
             <div aria-label="Time records button group" class="btn-group" role="group">
                 {% with ustr_checked=params.ustr|yesno:'checked,' %}
@@ -138,6 +145,8 @@
                         <i class="bi bi-clock-fill"></i>
                         {% elif oby == 'time' %}
                         <i class="bi bi-alarm"></i>
+                        {% elif oby == 'deadline' %}
+                        <i class="bi bi-stopwatch-fill"></i>
                         {% else %}
                         <i class="bi bi-type-h1"></i>
                         {% endif %}
@@ -154,6 +163,10 @@
                         <li>
                             <a class="dropdown-item" role="button" onclick="submitOrder('time')">
                                 <i class="bi bi-alarm me-2"></i> Time</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" role="button" onclick="submitOrder('deadline')">
+                                <i class="bi bi-stopwatch-fill me-2"></i> Deadline</a>
                         </li>
                         <li>
                             <a class="dropdown-item" role="button" onclick="submitOrder('title')">

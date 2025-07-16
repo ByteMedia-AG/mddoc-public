@@ -1,0 +1,33 @@
+<!-- Reactivation time modal -->
+<div aria-hidden="true" aria-labelledby="setReactTimeModalLabel" class="modal fade" id="setReactTimeModal" style="top: 70px;" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="setReactTimeModalLabel">Set the reactivation time</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <form method="post" action="{% url 'doc:set-react-time' doc_id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        If a reactivation time is specified, the current entry is set to archived and
+                        the flag is removed. At the specified time, the entry will be labelled as
+                        non-archived again and the flag will be set.
+                    </div>
+                    <div>
+                        <label for="reactivation_time" class="form-label">Reactivation time</label>
+                        <input type="datetime-local" class="form-control" id="reactivation_time" name="reactivation_time"
+                               {% if entity.reactivation_time %}
+                               value="{{ entity.reactivation_time|date:'Y-m-d\\TH:i' }}"
+                               {% endif %}
+                               min="{{ now|date:'Y-m-d\\TH:i' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -4,15 +4,7 @@
 {% block extra_css %}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="d-flex justify-content-between mb-3 border rounded bg-body-tertiary">
-        <div class="p-2 bd-highlight">
-            <a class="btn btn-secondary me-2" data-toggle="tooltip" href="{% url 'doc:home' %}" role="button" title="Back to search">
-                <i class="bi bi-chevron-double-left"></i>
-            </a>
-        </div>
-    </div>
-</div>
+{% include 'status/navbar.html' %}
 <div class="container">
     <h1 class="h2 mb-3 ms-2">{{ page_title }}</h1>
     {% if success %}

@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
         with connection.cursor() as cursor:
             for stmt in statements:
-                self.stdout.write(self.style.NOTICE(f"Executing:\n{stmt.strip()}"))
+                # self.stdout.write(self.style.NOTICE(f"Executing:\n{stmt.strip()}"))
                 cursor.executescript(stmt) if ';' in stmt else cursor.execute(stmt)
 
         self.stdout.write(self.style.SUCCESS("FTS5 index and triggers set up successfully."))

@@ -13,19 +13,26 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import localtime
+from django.utils.timezone import now
 from taggit.models import Tag
 
 from doc.forms import DocForm, TimeRecordForm
 from doc.markdown import md2html
 from doc.models import Doc
 from doc.models import File
-from doc.utils import extract_selected_info_from_url, get_tags_grouped
+from doc.utils import extract_selected_info_from_url, get_tags_grouped, reactivate_docs
+from django.db.models import Value
+from django.db.models.functions import Coalesce
+from django.utils.timezone import make_aware
+import datetime
 
 
 @login_required
 @permission_required("doc.search")
 def docs(request):
     """List of documents."""
+
+    reactivate_docs()
 
     tags = None
     error = False
@@ -46,6 +53,8 @@ def docs(request):
         oby = 'title'
     elif oby == 'time':
         oby = 'time'
+    elif oby == 'deadline':
+        oby = 'deadline'
     else:
         oby = 'created_at'
     if not asc:
@@ -68,6 +77,8 @@ def docs(request):
             entities = entities.exclude(is_archived=True)
         if params.get('flg', False):
             entities = entities.filter(is_flagged=True)
+        if params.get('ddl', False):
+            entities = entities.filter(deadline__isnull=False)
         if params.get('ustr', False):
             entities = entities.filter(has_unsettled_tr=True)
         if params.get('cgte', False):
@@ -83,7 +94,15 @@ def docs(request):
         if params.get('tlte', False):
             entities = entities.filter(time__lte=timezone.make_aware(parse_datetime(params.get('tlte'))))
         num_matches = entities.count()
-        entities = entities.order_by(oby)[:100]
+
+        if oby2 == 'deadline':
+            fallback_deadline = make_aware(datetime.datetime(1900, 1, 1))
+            entities = entities.annotate(
+                sort_deadline=Coalesce('deadline', Value(fallback_deadline))
+            ).order_by('sort_deadline' if asc else '-sort_deadline')[:100]
+        else:
+            entities = entities.order_by(oby)[:100]
+
         entity_ids = [e.id for e in entities]
         available_tags = Doc.tags \
                              .most_common(extra_filters={'doc__in': entity_ids}) \
@@ -116,6 +135,7 @@ def docs(request):
         'oby': oby2,
         'params': params,
         'num_matches': num_matches,
+        'now': now(),
     })
 
 
@@ -496,6 +516,61 @@ def doc_toggle_flag(request, **kwargs):
 
 
 @login_required
+@permission_required("doc.reactivation")
+def doc_set_reactivation_time(request, **kwargs):
+    """"""
+
+    doc_id = kwargs.get('id')
+
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+    try:
+        entity = Doc.objects.get(pk=doc_id)
+        reactivation_time_str = request.POST.get("reactivation_time")
+        reactivation_time = parse_datetime(reactivation_time_str) if reactivation_time_str else None
+        entity.reactivation_time = reactivation_time
+        if reactivation_time:
+            entity.is_flagged = False
+            entity.is_archived = True
+        entity.save()
+    except Doc.DoesNotExist as e:
+        return TemplateResponse(request, "doc.html", {
+            'page_title': f"Documentation - ID {doc_id}",
+            'doc_id': doc_id,
+            'error': 404,
+        })
+
+    return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+
+@login_required
+@permission_required("doc.reactivation")
+def doc_set_deadline(request, **kwargs):
+    """"""
+
+    doc_id = kwargs.get('id')
+
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+    try:
+        entity = Doc.objects.get(pk=doc_id)
+        deadline_str = request.POST.get("deadline")
+        deadline = parse_datetime(deadline_str) if deadline_str else None
+        entity.deadline = deadline
+        entity.save()
+    except Doc.DoesNotExist as e:
+        return TemplateResponse(request, "doc.html", {
+            'page_title': f"Documentation - ID {doc_id}",
+            'doc_id': doc_id,
+            'error': 404,
+        })
+
+    return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+
+@login_required
 @permission_required("doc.view")
 def doc(request, **kwargs):
     """Gets the details of the requested document."""
@@ -531,6 +606,10 @@ def doc(request, **kwargs):
             end = matches[i + 1].start() if i + 1 < len(matches) else len(entity.log)
             log.append((dt, entity.log[start:end].strip()))
 
+    overdue = False
+    if entity.deadline and entity.deadline < now():
+        overdue = True
+
     return TemplateResponse(request, "doc.html", {
         'page_title': f"{entity.title}",
         'entity': entity,
@@ -546,4 +625,6 @@ def doc(request, **kwargs):
         'files': entity.files.all().order_by('name'),
         'time_record_form': TimeRecordForm(),
         'time_records': list(entity.time_records.all().order_by('-date')) if entity.time_records.exists() else False,
+        'now': now(),
+        'overdue': overdue,
     })

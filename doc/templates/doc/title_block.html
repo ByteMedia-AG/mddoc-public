@@ -1,26 +1,31 @@
 {% load tz %}
+{% with entity.time|localtime as localtime %}
 <div class="d-flex flex-row align-items-center">
     <h1 class="h2 me-3 mb-0">{{ page_title }}</h1>
     {% if entity.successor and entity.deleted_at %}
-    <div class="h6 me-1"><span class="badge text-bg-warning">revision</span></div>
+    <div class="h6 me-2"><span class="badge text-bg-warning">revision</span></div>
     {% endif %}
     {% if entity.successor and not entity.deleted_at %}
-    <div class="h6 me-1"><span class="badge text-bg-primary">version</span></div>
+    <div class="h6 me-2"><span class="badge text-bg-primary">version</span></div>
     {% endif %}
     {% if entity.is_archived and not entity.successor %}
-    <div class="h6 me-1"><span class="badge text-bg-info">archived</span></div>
+    <div class="h6 me-2"><span class="badge text-bg-info">archived</span></div>
     {% endif %}
     {% if entity.deleted_at and not entity.successor %}
-    <div class="h6 me-1"><span class="badge text-bg-danger">deleted</span></div>
+    <div class="h6 me-2"><span class="badge text-bg-danger">deleted</span></div>
+    {% endif %}
+    {% if not entity.successor and entity.deadline and not overdue %}
+    <div class="h6 me-2"><span class="badge text-bg-warning">Due in {{ entity.deadline|timeuntil:now }}</span></div>
+    {% elif not entity.successor and entity.deadline and overdue and not entity.is_archived %}
+    <div class="h6 me-2"><span class="badge text-bg-danger">Overdue &mdash; {{ entity.deadline|date:"F j, Y, H:i" }}</span></div>
     {% endif %}
 </div>
 <small class="text-secondary">
-    {% with entity.time|localtime as localtime %}
     {% if localtime.hour == 0 and localtime.minute == 0 %}
     <strong>{{ localtime|date:"F j, Y" }}</strong>
     {% else %}
     <strong>{{ localtime|date:"F j, Y, H:i" }}</strong>
     {% endif %}
-    {% endwith %}
     &mdash; last updated: {{ entity.updated_at|date:"r" }}
 </small>
+{% endwith %}

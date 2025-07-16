@@ -91,6 +91,24 @@
             </button>
             {% endif %}
         </form>
+        {% if entity.reactivation_time %}
+        <a class="btn btn-warning me-2" data-bs-target="#setReactTimeModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Set reactivation time">
+            <i class="bi bi-calendar-check"></i>
+        </a>
+        {% else %}
+         <a class="btn btn-outline-warning me-2" data-bs-target="#setReactTimeModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Set reactivation time">
+            <i class="bi bi-calendar-check"></i>
+        </a>
+        {% endif %}
+        {% if entity.deadline %}
+        <a class="btn btn-warning me-2" data-bs-target="#setDeadlineModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Set deadline">
+            <i class="bi bi-calendar-event"></i>
+        </a>
+        {% else %}
+         <a class="btn btn-outline-warning me-2" data-bs-target="#setDeadlineModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Set deadline">
+            <i class="bi bi-calendar-event"></i>
+        </a>
+        {% endif %}
         <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc:edit' doc_id %}" role="button" title="Edit">
             <i class="bi bi-pencil"></i>
         </a>

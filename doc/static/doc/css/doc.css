@@ -34,6 +34,9 @@ main {
 .max-60-vh {
     max-height:60vh; overflow-y:scroll;
 }
+.max-33-vh {
+    max-height:33vh; overflow-y:scroll;
+}
 td.min {
     width: 1%;
     white-space: nowrap;

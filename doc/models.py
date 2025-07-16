@@ -73,6 +73,8 @@ class Doc(models.Model):
     last_settlement = models.DateField(blank=True, null=True, db_index=True, verbose_name='Last settlement', help_text='Date of the last settlement of outstanding hours')
     has_unsettled_tr = models.BooleanField(null=False, default=False, verbose_name='Has unsettled time records')
     files = models.ManyToManyField('File', blank=True, related_name='docs', verbose_name='Linked files')
+    reactivation_time = models.DateTimeField(blank=True, null=True, verbose_name='Reactivation time')
+    deadline = models.DateTimeField(blank=True, null=True, verbose_name='Deadline')
 
     objects = SearchManager()
 

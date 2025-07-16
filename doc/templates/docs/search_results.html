@@ -18,7 +18,19 @@
                 </div>
                 <div class="flex-grow-1">
                     <div class="d-flex w-100 justify-content-between">
-                        <h6 class="d-inline mb-1">{{ t.title }}{% if t.is_archived and not t.successor %}<span class="badge bg-transparent text-info border border-info ms-3">archived</span>{% endif %}</h6>
+                        <h6 class="d-inline mb-1">{{ t.title }}
+                            {% if t.is_archived and not t.successor %}
+                            <span class="badge bg-transparent text-info border border-info ms-1">archived</span>
+                            {% endif %}
+                            {% if t.reactivation_time and not t.successor %}
+                            <span class="badge bg-transparent text-success border border-success ms-1">Live in {{ t.reactivation_time|timeuntil:now }}</span>
+                            {% endif %}
+                            {% if t.deadline and not t.successor and t.deadline > now %}
+                            <span class="badge bg-transparent text-warning border border-warning ms-1">Due in {{ t.deadline|timeuntil:now }}</span>
+                            {% elif t.deadline and not t.successor and t.deadline < now and not t.is_archived %}
+                            <span class="badge bg-transparent text-danger border border-danger ms-1">Overdue &mdash; {{ t.deadline|date:"F j, Y, H:i" }}</span>
+                            {% endif %}
+                        </h6>
                         <small class="text-muted text-nowrap mt-1">{{ t.updated_at|timesince }}</small>
                     </div>
                     <small class="mb-1">
