@@ -1,0 +1,39 @@
+{% if checklist %}
+{% if entity.successor %}
+<div class="alert alert-secondary d-flex align-items-start position-relative" role="alert">
+    <div>
+        <i class="fs-4 bi-list-check me-4"></i>
+    </div>
+    <div class="list-group list-group-flush flex-fill">
+        {% for i in checklist %}
+        <label class="list-group-item bg-transparent text-secondary">
+            <input class="form-check-input me-3" type="checkbox"
+                   {% if i.checked %}checked{% endif %} disabled>
+            {{ i.description }}
+        </label>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<form method="post" action="{% url 'doc:check-item' doc_id %}">
+    {% csrf_token %}
+    <div class="alert alert-secondary d-flex align-items-start position-relative" role="alert">
+        <div>
+            <i class="fs-4 bi-list-check me-4"></i>
+        </div>
+        <div class="list-group list-group-flush flex-fill">
+            {% for i in checklist %}
+            <label class="list-group-item bg-transparent" style="color: var(--bs-secondary-text-emphasis)">
+                <input class="form-check-input me-3" type="checkbox"
+                       name="check_{{ i.id }}"
+                       value="1"
+                       {% if i.checked %}checked{% endif %}
+                       onchange="this.form.submit()">
+                {{ i.description }}
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endif %}

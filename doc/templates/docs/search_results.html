@@ -4,10 +4,14 @@
         <div class="position-relative py-3 px-3">
             <div class="position-relative z-1 bg-transparent d-flex w-100 justify-content-between">
                 <div class="d-flex align-items-start">
-                    {% if t.has_unsettled_tr %}
+                    {% if t.is_archived and not t.successor %}
+                    <i class="fs-3 lh-1 bi-file-earmark-zip opacity-100 me-3 text-info"></i>
+                    {% elif t.deadline and t.deadline < now and not t.successor and not t.completed_at %}
+                    <i class="fs-3 lh-1 bi-alarm-fill opacity-100 me-3 text-danger"></i>
+                    {% elif t.deadline and t.deadline > now and not t.successor %}
+                    <i class="fs-3 lh-1 bi-alarm opacity-100 me-3 text-warning"></i>
+                    {% elif t.has_unsettled_tr %}
                     <i class="fs-3 lh-1 bi-clock-history opacity-50 me-3"></i>
-                    {% elif t.file %}
-                    <i class="fs-3 lh-1 bi-file-earmark-arrow-down opacity-50 me-3"></i>
                     {% elif t.uri %}
                     <i class="fs-3 lh-1 bi bi-bookmark opacity-50 me-3"></i>
                     {% elif t.is_markdown %}
@@ -18,19 +22,7 @@
                 </div>
                 <div class="flex-grow-1">
                     <div class="d-flex w-100 justify-content-between">
-                        <h6 class="d-inline mb-1">{{ t.title }}
-                            {% if t.is_archived and not t.successor %}
-                            <span class="badge bg-transparent text-info border border-info ms-1">archived</span>
-                            {% endif %}
-                            {% if t.reactivation_time and not t.successor %}
-                            <span class="badge bg-transparent text-success border border-success ms-1">Live in {{ t.reactivation_time|timeuntil:now }}</span>
-                            {% endif %}
-                            {% if t.deadline and not t.successor and t.deadline > now %}
-                            <span class="badge bg-transparent text-warning border border-warning ms-1">Due in {{ t.deadline|timeuntil:now }}</span>
-                            {% elif t.deadline and not t.successor and t.deadline < now and not t.is_archived %}
-                            <span class="badge bg-transparent text-danger border border-danger ms-1">Overdue &mdash; {{ t.deadline|date:"F j, Y, H:i" }}</span>
-                            {% endif %}
-                        </h6>
+                        <h6 class="d-inline mb-1">{{ t.title }}</h6>
                         <small class="text-muted text-nowrap mt-1">{{ t.updated_at|timesince }}</small>
                     </div>
                     <small class="mb-1">
@@ -45,6 +37,21 @@
                         {{ t.text|truncatechars:300 }}
                         {% endif %}
                     </small>
+                    {% if not t.successor %}{% if t.reactivation_time or t.deadline or t.completed_at %}
+                    <div class="mt-2">
+                        {% if t.reactivation_time %}
+                        <span class="badge bg-transparent text-primary border border-primary me-1">Live in {{ t.reactivation_time|timeuntil:now }}</span>
+                        {% endif %}
+                        {% if t.deadline and t.deadline > now %}
+                        <span class="badge bg-transparent text-warning fw-normal border border-warning me-1">Due in {{ t.deadline|timeuntil:now }}</span>
+                        {% elif t.deadline and t.deadline < now and not t.is_archived and not t.completed_at %}
+                        <span class="badge bg-transparent text-danger border border-danger me-1">Overdue &mdash; {{ t.deadline|date:"F j, Y, H:i" }}</span>
+                        {% endif %}
+                        {% if t.completed_at %}
+                        <span class="badge bg-transparent text-success fw-normal border border-success me-1">Completed on {{ t.completed_at|date:"F j, Y" }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}{% endif %}
                 </div>
             </div>
             {% if t.deleted_at and t.successor %}

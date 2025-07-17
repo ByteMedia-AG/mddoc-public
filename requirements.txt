@@ -35,6 +35,8 @@ django-crispy-forms==2.4
     #   crispy-bootstrap5
 django-taggit==6.1.0
     # via -r requirements.in
+django-widget-tweaks==1.5.0
+    # via -r requirements.in
 et-xmlfile==2.0.0
     # via openpyxl
 events==0.5

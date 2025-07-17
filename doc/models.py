@@ -62,7 +62,7 @@ class Doc(models.Model):
     is_archived = models.BooleanField(null=False, default=False, db_index=True, verbose_name='Is considered archived or stale', help_text="If checked, the document is initially excluded in the search view.")
     uri = models.CharField(null=True, blank=True, max_length=2000, verbose_name='URI', help_text='If a URI is labelled, then the resource is regarded as meta information for the resource referenced with the URI.')
     tags = TaggableManager(blank=True)
-    tag = models.TextField(blank=True, null=True)  # Holds the string representation of the tags.
+    tag = models.TextField(blank=True, null=True, help_text='Holds the string representation of the tags.')
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
     successor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='predecessors')
@@ -75,6 +75,7 @@ class Doc(models.Model):
     files = models.ManyToManyField('File', blank=True, related_name='docs', verbose_name='Linked files')
     reactivation_time = models.DateTimeField(blank=True, null=True, verbose_name='Reactivation time')
     deadline = models.DateTimeField(blank=True, null=True, verbose_name='Deadline')
+    completed_at = models.DateTimeField(blank=True, null=True, verbose_name='Completed')
 
     objects = SearchManager()
 
@@ -106,6 +107,10 @@ class Doc(models.Model):
         revision.successor = self
         revision.save()
         revision.files.set(self.files.all())
+        for item in self.checklist_items.all():
+            item.pk = None
+            item.doc = revision
+            item.save()
 
     def restore_revision(self):
         """
@@ -128,6 +133,11 @@ class Doc(models.Model):
         successor.deleted_at = None
         successor.save()
         successor.files.set(self.files.all())
+        successor.checklist_items.all().delete()
+        for item in self.checklist_items.all():
+            item.pk = None
+            item.doc = successor
+            item.save()
 
     def delete(self, *args, **kwargs):
         """

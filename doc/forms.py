@@ -1,11 +1,11 @@
 import datetime
-from email.policy import default
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div, Submit, HTML, Field
+from crispy_forms.layout import Layout, Row, Column, Div, Submit, HTML
 from django import forms
+from django.forms import modelformset_factory
 
-from .models import Doc, TimeRecord
+from .models import Doc, TimeRecord, ChecklistItem
 from .widgets import EasyMdeTextarea
 
 
@@ -260,3 +260,25 @@ class CleanupForm(forms.Form):
             )
 
         return cleaned_data
+
+
+class ChecklistItemForm(forms.ModelForm):
+    class Meta:
+        model = ChecklistItem
+        fields = ['id', 'position', 'description', 'checked']
+        widgets = {
+            'id': forms.HiddenInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["description"].required = False
+
+
+ChecklistItemFormSet = modelformset_factory(
+    ChecklistItem,
+    form=ChecklistItemForm,
+    extra=1,
+    can_order=True,
+    can_delete=False
+)

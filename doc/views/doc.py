@@ -5,6 +5,8 @@ import re
 from bs4 import BeautifulSoup
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import connection
+from django.db.models import Value
+from django.db.models.functions import Coalesce
 from django.db.models.functions import Lower
 from django.db.utils import OperationalError
 from django.http import HttpResponseRedirect
@@ -13,18 +15,16 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import localtime
+from django.utils.timezone import make_aware
 from django.utils.timezone import now
 from taggit.models import Tag
 
+from doc.forms import ChecklistItemFormSet
 from doc.forms import DocForm, TimeRecordForm
 from doc.markdown import md2html
 from doc.models import Doc
 from doc.models import File
 from doc.utils import extract_selected_info_from_url, get_tags_grouped, reactivate_docs
-from django.db.models import Value
-from django.db.models.functions import Coalesce
-from django.utils.timezone import make_aware
-import datetime
 
 
 @login_required
@@ -79,6 +79,9 @@ def docs(request):
             entities = entities.filter(is_flagged=True)
         if params.get('ddl', False):
             entities = entities.filter(deadline__isnull=False)
+            # Entries whose deadline has passed and which have also been
+            # marked as completed must be excluded.
+            entities = entities.exclude(deadline__lte=now(), completed_at__isnull=False)
         if params.get('ustr', False):
             entities = entities.filter(has_unsettled_tr=True)
         if params.get('cgte', False):
@@ -95,11 +98,23 @@ def docs(request):
             entities = entities.filter(time__lte=timezone.make_aware(parse_datetime(params.get('tlte'))))
         num_matches = entities.count()
 
-        if oby2 == 'deadline':
-            fallback_deadline = make_aware(datetime.datetime(1900, 1, 1))
-            entities = entities.annotate(
-                sort_deadline=Coalesce('deadline', Value(fallback_deadline))
-            ).order_by('sort_deadline' if asc else '-sort_deadline')[:100]
+        if oby2 == 'deadline' or params.get('ddl', False):
+            # When filtering for entries with a deadline, the deadline is
+            # automatically set as the sorting criterion.
+            if not params.get('ddl', False):
+                # If you want to sort by deadline but do not want to restrict the
+                # sorting to entries with a deadline, you must set a default value
+                # for entries without a deadline.
+                fallback_deadline = make_aware(datetime.datetime(1900, 1, 1))
+                entities = entities.annotate(
+                    sort_deadline=Coalesce('deadline', Value(fallback_deadline))
+                ).order_by('sort_deadline' if asc else '-sort_deadline')[:100]
+            else:
+                # As only entries with a deadline can appear in the result set,
+                # no default value is required at this point.
+                # In addition, descending becomes ascending and vice versa, because
+                # the interpretation of the deadline is different.
+                entities = entities.order_by('-deadline' if asc else 'deadline')[:100]
         else:
             entities = entities.order_by(oby)[:100]
 
@@ -407,9 +422,6 @@ def doc_edit(request, **kwargs):
 
     if request.method == 'POST':
         form = DocForm(request.POST, request.FILES, instance=entity)
-        print(request.FILES)
-        print(request.FILES.getlist("upload"))
-        print(form.errors)
         if form.is_valid():
             entity.make_revision()
             entity = form.save()
@@ -480,6 +492,58 @@ def doc_toggle_archive(request, **kwargs):
             entity.is_archived = False
         else:
             entity.is_archived = True
+        entity.save()
+    except Doc.DoesNotExist as e:
+        return TemplateResponse(request, "doc.html", {
+            'page_title': f"Documentation - ID {doc_id}",
+            'doc_id': doc_id,
+            'error': 404,
+        })
+
+    return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+
+@login_required
+@permission_required("doc.edit")
+def doc_make_version(request, **kwargs):
+    """"""
+
+    doc_id = kwargs.get('id')
+
+    try:
+        entity = Doc.objects.get(pk=doc_id)
+        archived = entity.is_archived
+        entity.is_archived = True
+        entity.save()
+        entity.make_revision()
+        entity.is_archived = archived
+        entity.save()
+    except Doc.DoesNotExist as e:
+        return TemplateResponse(request, "doc.html", {
+            'page_title': f"Documentation - ID {doc_id}",
+            'doc_id': doc_id,
+            'error': 404,
+        })
+
+    return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+
+@login_required
+@permission_required("doc.edit")
+def doc_toggle_completed(request, **kwargs):
+    """"""
+
+    doc_id = kwargs.get('id')
+
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
+
+    try:
+        entity = Doc.objects.get(pk=doc_id)
+        if entity.completed_at:
+            entity.completed_at = None
+        else:
+            entity.completed_at = now()
         entity.save()
     except Doc.DoesNotExist as e:
         return TemplateResponse(request, "doc.html", {
@@ -610,6 +674,13 @@ def doc(request, **kwargs):
     if entity.deadline and entity.deadline < now():
         overdue = True
 
+    checklist_formset = ChecklistItemFormSet(queryset=entity.checklist_items.order_by('position'))
+
+    images = [
+        f for f in entity.files.all()
+        if f.name.lower().endswith(('.png', '.jpg', '.jpeg'))
+    ]
+
     return TemplateResponse(request, "doc.html", {
         'page_title': f"{entity.title}",
         'entity': entity,
@@ -627,4 +698,7 @@ def doc(request, **kwargs):
         'time_records': list(entity.time_records.all().order_by('-date')) if entity.time_records.exists() else False,
         'now': now(),
         'overdue': overdue,
+        'checklist_formset': checklist_formset,
+        'checklist': list(entity.checklist_items.order_by('position')),
+        'images': images,
     })

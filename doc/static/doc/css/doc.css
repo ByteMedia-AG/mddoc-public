@@ -43,7 +43,7 @@ td.min {
 }
 #btn-back-to-top {
     position: fixed;
-    bottom: 45px;
+    bottom: 55px;
     right: 40px;
     display: none;
     z-index:10;

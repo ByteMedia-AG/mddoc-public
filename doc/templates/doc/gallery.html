@@ -1,0 +1,26 @@
+{% if images %}
+<div class="alert alert-secondary">
+    <div class="d-flex align-items-center position-relative" role="alert">
+        <div>
+            <i class="fs-4 bi-images me-4"></i>
+        </div>
+        <div>
+            Open / close Gallery
+        </div>
+        <a class="stretched-link" data-bs-toggle="collapse" href="#collapseGallery" role="button" aria-expanded="false" aria-controls="collapseGallery">
+            <span class="visually-hidden"></span>
+        </a>
+    </div>
+    <div class="collapse mt-4" id="collapseGallery">
+        <div class="row g-2">
+            {% for i in images %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{{ MEDIA_URL }}{{ i.file }}" class="glightbox" data-gallery="gallery" title="{{ i.file }}">
+                    <img src="{{ MEDIA_URL }}{{ i.file }}" class="img-fluid rounded border">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -14,10 +14,14 @@
     {% if entity.deleted_at and not entity.successor %}
     <div class="h6 me-2"><span class="badge text-bg-danger">deleted</span></div>
     {% endif %}
+    {% if entity.completed_at %}
+    <div class="h6 me-2"><span class="badge text-bg-success fw-normal">Completed at {{ entity.completed_at|date:"F j, Y" }}</span></div>
+    {% else %}
     {% if not entity.successor and entity.deadline and not overdue %}
-    <div class="h6 me-2"><span class="badge text-bg-warning">Due in {{ entity.deadline|timeuntil:now }}</span></div>
+    <div class="h6 me-2"><span class="badge text-bg-warning fw-normal">Due in {{ entity.deadline|timeuntil:now }}</span></div>
     {% elif not entity.successor and entity.deadline and overdue and not entity.is_archived %}
-    <div class="h6 me-2"><span class="badge text-bg-danger">Overdue &mdash; {{ entity.deadline|date:"F j, Y, H:i" }}</span></div>
+    <div class="h6 me-2"><span class="badge text-bg-danger fw-normal">Overdue &mdash; {{ entity.deadline|date:"F j, Y, H:i" }}</span></div>
+    {% endif %}
     {% endif %}
 </div>
 <small class="text-secondary">
