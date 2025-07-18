@@ -55,11 +55,17 @@
     }
     .EasyMDEContainer .editor-toolbar {
         position: sticky;
-        top: 0;
+        top: 61px;
         z-index: 8;
-        border: 0;
+        border-left: 0;
+        border-right: 0;
+        border-top: var(--bs-border-width) solid var(--bs-border-color);
         border-bottom: var(--bs-border-width) solid var(--bs-border-color);
         background-color: var(--bs-body-bg);
+    }
+    .editor-toolbar i.separator {
+        border: 0;
+        border-left: var(--bs-border-width) solid var(--bs-border-color);
     }
 </style>
 {% endblock %}
@@ -111,20 +117,21 @@
                       name: "bold",
                       action: EasyMDE.toggleBold,
                       className: "bi bi-type-bold",
-                      title: "Fett"
+                      title: "Bold"
                     },
                     {
                       name: "italic",
                       action: EasyMDE.toggleItalic,
                       className: "bi bi-type-italic",
-                      title: "Kursiv"
+                      title: "Italic"
                     },
                     {
                       name: "heading",
                       action: EasyMDE.toggleHeadingSmaller,
                       className: "bi bi-type-h1",
-                      title: "Überschrift"
+                      title: "Headline"
                     },
+                     "|",
                     {
                       name: "code",
                       action: EasyMDE.toggleCodeBlock,
@@ -135,14 +142,44 @@
                       name: "unordered-list",
                       action: EasyMDE.toggleUnorderedList,
                       className: "bi bi-list-ul",
-                      title: "Ungeordnete Liste"
+                      title: "Unordered list"
                     },
                     {
                       name: "ordered-list",
                       action: EasyMDE.toggleOrderedList,
                       className: "bi bi-list-ol",
-                      title: "Geordnete Liste"
+                      title: "Ordered list"
                     },
+                    "|",
+                    {
+                       name: "link",
+                       action: EasyMDE.drawLink,
+                       className: "bi bi-link-45deg",
+                       title: "Link"
+                     },
+                     {
+                       name: "image",
+                       action: EasyMDE.drawImage,
+                       className: "bi bi-image",
+                       title: "Image"
+                     },
+                    "|",
+                    {
+                      name: "clean-block",
+                      action: EasyMDE.cleanBlock,
+                      className: "bi bi-eraser",
+                      title: "Remove decoration"
+                    },
+                    "|",
+                    {
+                      name: "save",
+                      action: function customSave(editor) {
+                        const form = document.getElementById("doc-edit");
+                        if (form) form.requestSubmit();
+                      },
+                      className: "bi bi-check-circle",
+                      title: "Save"
+                    }
                 ],
                 status: false
             });

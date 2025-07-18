@@ -1,8 +1,9 @@
 import datetime
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div, Submit, HTML
+from crispy_forms.layout import Layout, Row, Column, Div, Submit, HTML, Field
 from django import forms
+from django.db.models.functions import Lower
 from django.forms import modelformset_factory
 
 from .models import Doc, TimeRecord, ChecklistItem
@@ -12,6 +13,10 @@ from .widgets import EasyMdeTextarea
 # Custom widget to allow multiple file selection
 class MultiFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
+
+
+class CheckboxCollapse(Field):
+    template = 'doc_edit/checkbox_collapse.html'
 
 
 class DocForm(forms.ModelForm):
@@ -47,10 +52,10 @@ class DocForm(forms.ModelForm):
 
         if self.instance.pk and self.instance.files.exists():
             self.fields["delete_files"] = forms.MultipleChoiceField(
-                label="Remove selected files",
+                label="Select files to be deleted",
                 required=False,
                 widget=forms.CheckboxSelectMultiple,
-                choices=[(str(f.id), f"{f.name} ({f.id})") for f in self.instance.files.all()],
+                choices=[(str(f.id), f"{f.name} ({f.id})") for f in self.instance.files.all().order_by(Lower('name'))],
             )
             show_delete_files = True
         else:
@@ -79,7 +84,7 @@ class DocForm(forms.ModelForm):
                 ),
                 css_class="form-row",
             ),
-            *([Div("delete_files", css_class="border rounded p-3")] if show_delete_files else []),
+            *([CheckboxCollapse("delete_files", css_class="border rounded p-3")] if show_delete_files else []),
             Div(
                 "is_markdown",
                 css_class="mt-3"

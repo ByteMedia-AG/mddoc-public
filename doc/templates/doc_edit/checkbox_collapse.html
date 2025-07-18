@@ -1,0 +1,18 @@
+{% load crispy_forms_field %}
+
+<div class="border rounded p-3 mt-3 mb-4">
+  <div class="d-flex justify-content-between position-relative">
+    <div class="flex-fill">
+      <label class="custom-control-label">{{ field.label }}</label>
+    </div>
+    <div>
+      <small>show / hide</small>
+    </div>
+    <a class="stretched-link" data-bs-toggle="collapse" href="#collapse{{ field.name }}" role="button" aria-expanded="false" aria-controls="collapse{{ field.name }}">
+      <span class="visually-hidden"></span>
+    </a>
+  </div>
+  <div class="mt-2 collapse" id="collapse{{ field.name }}">
+    {% crispy_field field 'class' 'border-0' %}
+  </div>
+</div>

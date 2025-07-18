@@ -1,10 +1,25 @@
 {% if checklist %}
 {% if entity.successor %}
-<div class="alert alert-secondary d-flex align-items-start position-relative" role="alert">
-    <div>
-        <i class="fs-4 bi-list-check me-4"></i>
+<div class="alert alert-secondary" role="alert">
+    <div class="d-flex align-items-center position-relative">
+        <div>
+            <i class="fs-4 bi-list-check me-4"></i>
+        </div>
+        <div class="w-100">
+            <div class="d-flex justify-content-between">
+                <div class="fw-bold">
+                    Checklist
+                </div>
+                <div>
+                    <small>show / hide</small>
+                </div>
+            </div>
+        </div>
+        <a class="stretched-link" data-bs-toggle="collapse" href="#collapseChecklist" role="button" aria-expanded="true" aria-controls="collapseChecklist">
+            <span class="visually-hidden"></span>
+        </a>
     </div>
-    <div class="list-group list-group-flush flex-fill">
+    <div class="collapse show list-group list-group-flush w-100 mt-2" id="collapseChecklist">
         {% for i in checklist %}
         <label class="list-group-item bg-transparent text-secondary">
             <input class="form-check-input me-3" type="checkbox"
@@ -17,11 +32,26 @@
 {% else %}
 <form method="post" action="{% url 'doc:check-item' doc_id %}">
     {% csrf_token %}
-    <div class="alert alert-secondary d-flex align-items-start position-relative" role="alert">
-        <div>
-            <i class="fs-4 bi-list-check me-4"></i>
+    <div class="alert alert-secondary" role="alert">
+        <div class="d-flex align-items-center position-relative">
+            <div>
+                <i class="fs-4 bi-list-check me-4"></i>
+            </div>
+            <div class="w-100">
+                <div class="d-flex justify-content-between">
+                    <div class="fw-bold">
+                        Checklist
+                    </div>
+                    <div>
+                        <small>show / hide</small>
+                    </div>
+                </div>
+            </div>
+            <a class="stretched-link" data-bs-toggle="collapse" href="#collapseChecklist" role="button" aria-expanded="true" aria-controls="collapseChecklist">
+                <span class="visually-hidden"></span>
+            </a>
         </div>
-        <div class="list-group list-group-flush flex-fill">
+        <div class="collapse show list-group list-group-flush w-100 mt-2" id="collapseChecklist">
             {% for i in checklist %}
             <label class="list-group-item bg-transparent" style="color: var(--bs-secondary-text-emphasis)">
                 <input class="form-check-input me-3" type="checkbox"

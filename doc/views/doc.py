@@ -24,7 +24,7 @@ from doc.forms import DocForm, TimeRecordForm
 from doc.markdown import md2html
 from doc.models import Doc
 from doc.models import File
-from doc.utils import extract_selected_info_from_url, get_tags_grouped, reactivate_docs
+from doc.utils import extract_selected_info_from_url, get_tags_grouped, reactivate_docs, calculate_delta_time
 
 
 @login_required
@@ -56,7 +56,7 @@ def docs(request):
     elif oby == 'deadline':
         oby = 'deadline'
     else:
-        oby = 'created_at'
+        oby = 'updated_at'
     if not asc:
         oby = f'-{oby}'
 
@@ -589,10 +589,12 @@ def doc_set_reactivation_time(request, **kwargs):
     if request.method != 'POST':
         return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
 
+    set_time = request.POST.get("set-time", "").strip()
+    reactivation_time_str = request.POST.get("reactivation_time", "").strip()
+    reactivation_time = calculate_delta_time(set_time, reactivation_time_str)
+
     try:
         entity = Doc.objects.get(pk=doc_id)
-        reactivation_time_str = request.POST.get("reactivation_time")
-        reactivation_time = parse_datetime(reactivation_time_str) if reactivation_time_str else None
         entity.reactivation_time = reactivation_time
         if reactivation_time:
             entity.is_flagged = False
@@ -618,10 +620,12 @@ def doc_set_deadline(request, **kwargs):
     if request.method != 'POST':
         return HttpResponseRedirect(reverse("doc:detail", args=(doc_id,)))
 
+    set_time = request.POST.get("set-time", "").strip()
+    deadline_str = request.POST.get("deadline", "").strip()
+    deadline = calculate_delta_time(set_time, deadline_str)
+
     try:
         entity = Doc.objects.get(pk=doc_id)
-        deadline_str = request.POST.get("deadline")
-        deadline = parse_datetime(deadline_str) if deadline_str else None
         entity.deadline = deadline
         entity.save()
     except Doc.DoesNotExist as e:
@@ -693,7 +697,7 @@ def doc(request, **kwargs):
         'revisions': entity.predecessors.order_by('updated_at').reverse(),
         'diff': diff,
         'log': log,
-        'files': entity.files.all().order_by('name'),
+        'files': entity.files.all().order_by(Lower('name')),
         'time_record_form': TimeRecordForm(),
         'time_records': list(entity.time_records.all().order_by('-date')) if entity.time_records.exists() else False,
         'now': now(),

@@ -4,9 +4,9 @@ register = template.Library()
 
 MIME_TYPE_MAP = {
     "application/pdf": "PDF",
-    "image/jpeg": "JPEG Image",
-    "image/png": "PNG Image",
-    "text/plain": "Text File",
+    "image/jpeg": "JPEG",
+    "image/png": "PNG",
+    "text/plain": "Text",
     "application/zip": "ZIP",
     "application/msword": "Word",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word",
@@ -15,6 +15,10 @@ MIME_TYPE_MAP = {
     "application/vnd.ms-powerpoint": "PowerPoint",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation": "PowerPoint",
     "application/xml": "XML",
+    "application/x-sql": "SQL",
+    "text/markdown": "Markdown",
+    "application/x-tar": "TAR",
+    "text/html": "HTML",
 }
 
 

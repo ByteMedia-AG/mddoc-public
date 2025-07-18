@@ -1,0 +1,51 @@
+{% load file_filters %}
+{% if files %}
+<div class="alert alert-secondary" role="alert">
+    <div class="d-flex align-items-center position-relative">
+        <div>
+            <i class="fs-4 bi-file-earmark-arrow-down me-4"></i>
+        </div>
+        <div class="w-100">
+            <div class="d-flex justify-content-between">
+                <div class="fw-bold">
+                    {% if files|length > 1 %}
+                    Files
+                    {% else %}
+                    File
+                    {% endif %}
+                </div>
+                <div>
+                    <small>show / hide</small>
+                </div>
+            </div>
+        </div>
+        <a class="stretched-link" data-bs-toggle="collapse" href="#collapseFiles" role="button" aria-expanded="false" aria-controls="collapseFiles">
+            <span class="visually-hidden"></span>
+        </a>
+    </div>
+    <ul class="collapse list-group list-group-flush bg-transparent w-100 mt-2" id="collapseFiles">
+        {% for f in files %}
+        <li class="list-group-item bg-transparent">
+            <div class="d-flex flex-row" style="color: var(--bs-secondary-text-emphasis)">
+                <div class="me-2 text-nowrap" style="min-width: 2rem;">
+                    <small>{{ f.id }}</small>
+                </div>
+                <div class="flex-fill position-relative">
+                    {{ f.name }}
+                    <a href="{{ MEDIA_URL }}{{ f.file }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ f.file }}</span></a>
+                </div>
+                <div class="me-2 text-end text-nowrap" style="width: 10rem;">
+                    <small>{{ f.uploaded_at|date:"Y-m-d\TH:i O" }}</small>
+                </div>
+                <div class="me-2 text-end" style="width: 6rem;">
+                    <small>{{ f.mime_type|filetype }}</small>
+                </div>
+                <div class="text-end text-nowrap" style="min-width: 5rem;">
+                    <small>{{ f.size|filesize }}</small>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

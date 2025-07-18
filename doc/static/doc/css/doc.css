@@ -80,3 +80,54 @@ td.min {
     font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
     font-size: 1em;
 }
+.gallery-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+}
+.table th, td {
+    color: var(--bs-secondary-text-emphasis)!important;
+}
+.pos-below {
+    top: 60px;
+}
+header {
+    min-height: 60px;
+}
+#id_delete_files {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background-color: transparent; /* Hintergrund entfernen */
+  margin-left: 0 !important;     /* Linker Abstand weg */
+  margin-right: 0 !important;    /* Rechter Abstand weg */
+  padding-left: 0 !important;    /* Optional: Innenabstand links */
+  padding-right: 0 !important;   /* Optional: Innenabstand rechts */
+  border: none !important;       /* Optional: Rahmen um Gesamtcontainer entfernen */
+}
+#id_delete_files > div:first-child {
+  border-top: 0 !important;
+}
+#id_delete_files > div {
+  padding: 0.75rem 1.25rem;
+  border-top: var(--bs-border-width) solid var(--bs-border-color);
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 0;
+  background-color: transparent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+#id_delete_files > div input[type="checkbox"] {
+  margin-right: 0.75rem;
+}
+#id_delete_files > div label {
+  width: 100%;
+  cursor: pointer;
+}

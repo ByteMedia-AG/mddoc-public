@@ -44,7 +44,7 @@
                         {% endif %}
                         {% if t.deadline and t.deadline > now %}
                         <span class="badge bg-transparent text-warning fw-normal border border-warning me-1">Due in {{ t.deadline|timeuntil:now }}</span>
-                        {% elif t.deadline and t.deadline < now and not t.is_archived and not t.completed_at %}
+                        {% elif t.deadline and t.deadline < now and not t.completed_at %}
                         <span class="badge bg-transparent text-danger border border-danger me-1">Overdue &mdash; {{ t.deadline|date:"F j, Y, H:i" }}</span>
                         {% endif %}
                         {% if t.completed_at %}

@@ -58,36 +58,7 @@
     </div>
     {% endif %}
     {% include 'doc/checklist.html' %}
-    {% if files %}
-    <div class="alert alert-secondary d-flex align-items-start position-relative" role="alert">
-        <div>
-            <i class="fs-4 bi-file-earmark-arrow-down me-4"></i>
-        </div>
-        <div class="d-flex flex-fill">
-            <ul class="list-group list-group-flush bg-transparent w-100">
-                {% for f in files %}
-                <li class="list-group-item bg-transparent">
-                    <div class="d-flex flex-row" style="color: var(--bs-secondary-text-emphasis)">
-                        <div class="me-2 text-nowrap" style="min-width: 2rem;">
-                            <small>{{ f.id }}</small>
-                        </div>
-                        <div class="flex-fill position-relative">
-                            {{ f.name }}
-                            <a href="{{ MEDIA_URL }}{{ f.file }}" class="stretched-link" target="_blank"><span class="visually-hidden">{{ f.file }}</span></a>
-                        </div>
-                        <div class="me-2 text-end" style="width: 6rem;">
-                            <small>{{ f.mime_type|filetype }}</small>
-                        </div>
-                        <div class="text-end text-nowrap" style="min-width: 5rem;">
-                            <small>{{ f.size|filesize }}</small>
-                        </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% endif %}
+    {% include 'doc/files.html' %}
     {% include 'doc/gallery.html' %}
     {% if entity.text %}
     {% if entity.is_markdown %}
@@ -221,5 +192,16 @@ new Sortable(list, {
   document.addEventListener('DOMContentLoaded', function () {
     GLightbox({ selector: '.glightbox' });
   });
+</script>
+<script>
+function submitWithValue(btn) {
+    const form = btn.closest('form');
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'set-time';
+    input.value = btn.value;
+    form.appendChild(input);
+    form.submit();
+}
 </script>
 {% endblock %}

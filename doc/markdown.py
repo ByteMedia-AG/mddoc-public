@@ -18,7 +18,7 @@ def md2html(md_text):
                 'noclasses': False,
             }
         },
-        output_format='html5'
+        output_format='html5',
     )
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -53,12 +53,35 @@ def md2html(md_text):
         bq['class'] = 'blockquote'
 
     for table in soup.find_all('table'):
-        wrapper = soup.new_tag('div', **{'class': 'max-80-vh position-relative'})
+        # wrapper = soup.new_tag('div', **{'class': 'max-80-vh position-relative'})
+        wrapper = soup.new_tag('div', **{'class': ''})
         table.wrap(wrapper)
         thead = table.find('thead')
         if thead:
-            thead['class'] = thead.get('class', []) + ['sticky-top']
+            thead['class'] = thead.get('class', []) + ['sticky-top z-1 pos-below']
         table['class'] = 'table'
+
+    for img in soup.find_all('img'):
+        # Transform
+        #   <img alt="{alt}" src="{url}" title="{title}">
+        # to
+        #   <figure class="figure mx-auto d-block">
+        #       <img src="{url}" class="figure-img img-fluid rounded mx-auto d-block" alt="{alt}">
+        #       <figcaption class="figure-caption text-center">{title}</figcaption>
+        #   </figure>
+        alt = img.get('alt', '')
+        src = img.get('src', '')
+        title = img.get('title', '')
+        figure = soup.new_tag('figure', **{'class': 'figure mx-auto d-block'})
+        new_img = soup.new_tag('img', src=src, alt=alt, **{
+            'class': 'figure-img img-fluid rounded mx-auto d-block'
+        })
+        figure.append(new_img)
+        if title:
+            caption = soup.new_tag('figcaption', **{'class': 'figure-caption text-center'})
+            caption.string = title
+            figure.append(caption)
+        img.replace_with(figure)
 
     html = str(soup)
 

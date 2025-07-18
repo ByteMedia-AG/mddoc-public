@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count
-from django.db.models import Min, Max
+from django.db.models import Count, Min, Max, F, Sum
 from django.template.response import TemplateResponse
 
 from doc.models import Doc, TimeRecord
 from doc.models import File
-from doc.utils import flatten_settings
+from doc.utils import flatten_settings, duplicate_files
 
 
 @login_required
@@ -22,14 +21,14 @@ def status(request, **kwargs):
 
     docs['All'] = Doc.objects.all().count()
     docs['Current'] = Doc.objects.filter(
-        deleted_at__isnull=True, is_archived=False).count()
+        deleted_at__isnull=True, successor__isnull=True).count()
     docs['Current, with unsettled time records'] = TimeRecord.objects.filter(
         settled_at__isnull=True, deleted_at__isnull=True,
-        doc__deleted_at__isnull=True, doc__is_archived=False).values_list('doc_id', flat=True).distinct().count()
+        doc__deleted_at__isnull=True, doc__successor__isnull=True).values_list('doc_id', flat=True).distinct().count()
     docs['Current, with file attachment'] = Doc.objects.annotate(num_files=Count('files')).filter(
-        deleted_at__isnull=True, is_archived=False, num_files__gt=0).count()
+        deleted_at__isnull=True, successor__isnull=True, num_files__gt=0).count()
     docs['Archived'] = Doc.objects.filter(
-        deleted_at__isnull=True, is_archived=True).count()
+        deleted_at__isnull=True, successor__isnull=True, is_archived=True).count()
     docs['Versions'] = Doc.objects.filter(
         deleted_at__isnull=True, successor__isnull=False).count()
     docs['Revisions'] = Doc.objects.filter(
@@ -51,7 +50,29 @@ def status(request, **kwargs):
     ).count()
 
     file['All'] = File.objects.all().count()
+    file['Duplicates'] = (
+        File.objects
+        .values('name', 'sha256')
+        .annotate(dupes=Count('id'))
+        .filter(dupes__gt=1)
+        .aggregate(redundant=Sum(F('dupes') - 1))['redundant'] or 0
+    )
     file['Orphaned'] = File.objects.filter(docs__isnull=True).count()
+
+    print(duplicate_files())
+
+    # if True:
+    #     duplicate_groups = (
+    #         File.objects
+    #         .values('name', 'sha256')
+    #         .annotate(dupes=Count('id'))
+    #         .filter(dupes__gt=1)
+    #     )
+    #     for group in duplicate_groups:
+    #         dupes = File.objects.filter(name=group['name'], sha256=group['sha256'])
+    #         print(f"\nDuplicate group: name={group['name']}, sha256={group['sha256']}")
+    #         for f in dupes:
+    #             print(f" - ID: {f.id}, path: {f.file.path}, created: {f.uploaded_at}")
 
     trs_time['Youngest'] = TimeRecord.objects.aggregate(Max('created_at'))['created_at__max']
     trs_time['Oldest'] = TimeRecord.objects.aggregate(Min('created_at'))['created_at__min']
