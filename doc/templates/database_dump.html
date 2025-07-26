@@ -8,14 +8,20 @@
 <div class="container">
     <h1 class="h2 mb-3 ms-2">{{ page_title }}</h1>
     {% if success %}
-    <div class="alert alert-success" role="alert">
-        <ul>
-            {% for p in success %}
-            <li class="my-2">
-                {{ p }}
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-hand-thumbs-up me-4"></i>
+        <div>
+            <h2 class="h5 mb-2">Success</h2>
+            <div>
+                <ul>
+                    {% for p in success %}
+                    <li class="my-2">
+                        {{ p }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
     {% endif %}
     {% if error %}
@@ -29,11 +35,18 @@
         </ul>
     </div>
     {% endif %}
-    <div class="alert alert-info" role="alert">
-        Please note that if you want to search for database backups in the application,
-        you must explicitly display archived entries. Database backups are marked as
-        archived by default. Or use this
-        <a class="alert-link text-decoration-none" href="{% url 'doc:home' %}?search=+%23db-dump&iar=on">example search query</a>.
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="h1 bi bi-info-circle me-4"></i>
+        <div>
+            <h2 class="h5 mb-2">Filter database dumps</h2>
+            <div>
+                Please note that if you want to search for database backups in the application,
+                you must explicitly display archived entries. Database backups are marked as
+                archived by default. Or use this
+                <a class="alert-link text-decoration-none" href="{% url 'doc:home' %}?search=+%23db-dump&iar=on">example search query</a>.
+
+            </div>
+        </div>
     </div>
     <form class="border rounded p-3" method="post">
         {% csrf_token %}

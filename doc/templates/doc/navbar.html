@@ -56,7 +56,7 @@
         </a>
         {% endif %}
          <a class="btn btn-primary me-2" data-bs-target="#editChecklistModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Add / Edit checklist">
-            <i class="bi bi-list-check"></i>
+            <i class="bi bi-ui-checks"></i>
         </a>
     </div>
     <div class="p-2 bd-highlight">
@@ -116,27 +116,40 @@
         </form>
     </div>
     <div class="p-2 bd-highlight">
-        <form method="post" action="{% url 'doc:make-version' doc_id %}" style="display:inline;">
+        {% if can_md2pdf %}
+        <form method="post" action="{% url 'doc:create-pdf' doc_id %}" target="_blank" style="display:inline;">
             {% csrf_token %}
             <div class="btn-group me-2">
+                <button class="btn btn-outline-info" data-toggle="tooltip" role="button" name="variant" value="pdf" type="submit" title="PDF">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                </button>
+                <button class="btn btn-outline-info" data-toggle="tooltip" role="button" name="variant" value="pdf-a" type="submit" title="PDF (archive format)">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                </button>
+            </div>
+        </form>
+        {% endif %}
+        <form method="post" action="{% url 'doc:make-version' doc_id %}" style="display:inline;">
+            {% csrf_token %}
+            <div class="btn-group">
+                <button class="btn btn-info" data-toggle="tooltip" role="button" type="submit" title="Make archive copy">
+                    <i class="bi bi-archive"></i>
+                </button>
                 {% if revisions %}
-                <a class="btn btn-outline-success" data-bs-target="#showRevisionsModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Show revisions">
+                <a class="btn btn-outline-info" data-bs-target="#showRevisionsModal" data-bs-toggle="modal" data-placement="top" data-toggle="tooltip" href="" role="button" title="Show revisions">
                     <i class="bi bi-view-list"></i>
                 </a>
                 {% endif %}
-                <button class="btn btn-success" data-toggle="tooltip" role="button" type="submit" title="Make archive copy">
-                    <i class="bi bi-archive"></i>
-                </button>
             </div>
-            <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc:edit' doc_id %}" role="button" title="Edit">
-                <i class="bi bi-pencil"></i>
-            </a>
         </form>
     </div>
     <div class="p-2 bd-highlight">
-        <a class="btn btn-danger" data-bs-target="#confirmDeleteModal" data-bs-toggle="modal" data-toggle="tooltip" href="" role="button" title="Delete">
+        <a class="btn btn-danger me-2" data-bs-target="#confirmDeleteModal" data-bs-toggle="modal" data-toggle="tooltip" href="" role="button" title="Delete">
             <i class="bi bi-trash"></i>
         </a>
+        <a class="btn btn-primary" data-toggle="tooltip" href="{% url 'doc:edit' doc_id %}" role="button" title="Edit">
+                <i class="bi bi-pencil"></i>
+            </a>
     </div>
     {% endif %}
 </div>

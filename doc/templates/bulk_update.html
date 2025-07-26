@@ -202,4 +202,33 @@
 {% endblock content %}
 
 {% block extra_js%}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector("#add-tag");
+
+    if (input) {
+      const tagify = new Tagify(input, {
+        enforceWhitelist: false,
+        whitelist: [],
+        dropdown: {
+          enabled: 1,
+          maxItems: 10,
+          position: "text",
+          closeOnSelect: false
+        },
+        originalInputValueFormat: values => values.map(v => v.value).join(","),
+      });
+
+      tagify.on("input", async function(e) {
+        let value = e.detail.value;
+        let response = await fetch(`{% url 'doc:tag-suggest' %}?q=${encodeURIComponent(value)}`);
+        let data = await response.json();
+        tagify.settings.whitelist = data;
+        tagify.dropdown.show.call(tagify, value);
+      });
+    } else {
+      console.error("Tagify input not found");
+    }
+  });
+</script>
 {% endblock %}

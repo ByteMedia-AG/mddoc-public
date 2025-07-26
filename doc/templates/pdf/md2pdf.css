@@ -1,0 +1,220 @@
+{% load static %}
+@page {
+  size: A4;
+  margin: 3.0cm 2.5cm 2.5cm 2.5cm;
+
+  @top {
+    width: 100%;
+  }
+
+  @bottom {
+    width: 100%;
+    padding-left: 2.5cm;
+    padding-right: 2.5cm;
+  }
+
+  @top-left {
+    content: url("file://{{ path_to_images }}/bytemedia.svg");
+    transform: scale(0.7);
+    text-align: left;
+    display: block;
+    margin-left: -0.7cm;
+  }
+
+  @top-right {
+    content: "{{ title|safe }}";
+    text-align: right;
+    font-family: "Montserrat", sans-serif;
+    font-size: 9pt;
+  }
+
+  @bottom-left {
+    content: "{{ footer }}";
+    font-family: "Montserrat", sans-serif;
+    font-size: 9pt;
+  }
+
+  @bottom-right {
+    content: "Page " counter(page) " / " counter(pages);
+    font-family: "Montserrat", sans-serif;
+    font-size: 9pt;
+  }
+}
+
+@font-face {
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-size: 10pt;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 16pt;
+  margin-top: 2.5em;
+  margin-bottom: 1.5em;
+}
+
+h2 {
+  font-size: 14pt;
+  margin-top: 1.5em;
+}
+
+h3 {
+  font-size: 12pt;
+  margin-top: 1.5em;
+}
+
+h4 {
+  font-size: 10pt;
+  margin-top: 1em;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+pre {
+  background: #e0e0e0;
+  padding: 0.5em 1.2em;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: 9pt;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 8pt;
+}
+
+th, td {
+  border: 0.5px solid black;
+  padding: 0.4em;
+  text-align: left;
+}
+
+thead {
+  background-color: #f0f0f0;
+}
+
+figure {
+  display: block;
+  margin-bottom: 0.5em;
+  margin-top: 1em;
+  text-align: center;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+figcaption {
+  font-size: 8pt;
+  margin-top: 0;
+  margin-bottom: 1em;
+  font-style: italic;
+}
+
+ul, ol {
+  padding-left: 1.2em;
+  margin-left: 0;
+}
+
+img,
+table,
+pre {
+  margin-bottom: 2em;
+}
+
+body > *:first-child {
+  margin-top: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid black;
+  margin: 2em 0;
+}
+
+figure > img {
+  margin-bottom: 1em !important;
+}
+
+div.archive-notice {
+    margin-top: 2em;
+    margin-bottom: 3em;
+    font-style: italic;
+    font-weight: 400;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+h1 + h2,
+h2 + h3,
+h3 + h4,
+h4 + h5 {
+  margin-top: 0;
+}
+
+body {
+  counter-reset: h2;
+}
+
+h2 {
+  counter-reset: h3;
+}
+
+h3 {
+  counter-reset: h4;
+}
+
+h2::before {
+  counter-increment: h2;
+  content: counter(h2) " - ";
+}
+
+h3::before {
+  counter-increment: h3;
+  content: counter(h2) "." counter(h3) " - ";
+}
+
+h4::before {
+  counter-increment: h4;
+  content: counter(h2) "." counter(h3) "." counter(h4) " - ";
+}

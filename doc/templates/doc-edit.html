@@ -103,6 +103,35 @@
 {% block extra_js %}
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector("#id_tags");
+
+    if (input) {
+      const tagify = new Tagify(input, {
+        enforceWhitelist: false,
+        whitelist: [],
+        dropdown: {
+          enabled: 1,
+          maxItems: 10,
+          position: "text",
+          closeOnSelect: false
+        },
+        originalInputValueFormat: values => values.map(v => v.value).join(","),
+      });
+
+      tagify.on("input", async function(e) {
+        let value = e.detail.value;
+        let response = await fetch(`{% url 'doc:tag-suggest' %}?q=${encodeURIComponent(value)}`);
+        let data = await response.json();
+        tagify.settings.whitelist = data;
+        tagify.dropdown.show.call(tagify, value);
+      });
+    } else {
+      console.error("Tagify input not found");
+    }
+  });
+</script>
+<script>
     let markdownCheckbox = document.getElementById("id_is_markdown");
     let textarea = document.getElementById("id_text");
     let easyMDE = null;

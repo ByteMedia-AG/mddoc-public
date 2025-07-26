@@ -1,44 +1,25 @@
-import csv
-import datetime
-import difflib
-import io
 import os
-import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import traceback
-from decimal import Decimal
-from io import BytesIO
-from itertools import groupby
 from pathlib import Path
 
-import openpyxl
-from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.files import File as DjangoFile
-from django.db import connection
-from django.db.models import Min, Max
 from django.db.models import Subquery
-from django.db.models.functions import Lower
-from django.db.utils import OperationalError
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.dateparse import parse_date
-from django.utils.dateparse import parse_datetime
-from django.utils.timezone import localtime
-from openpyxl.styles import Alignment, Border, Side
-from taggit.models import Tag, TaggedItem
+from taggit.models import TaggedItem
 
-from doc.forms import DocForm, TimeRecordForm, CleanupForm
-from doc.markdown import md2html
+from doc.forms import CleanupForm
 from doc.models import Doc, TimeRecord
 from doc.models import File
-from doc.utils import extract_selected_info_from_url
 
 
 @login_required
@@ -68,6 +49,7 @@ def cleanup_database(request, **kwargs):
         number_of_deleted_docs = 0
         number_of_deleted_revisions = 0
         number_of_deleted_archived_revisions = 0
+        number_of_removed_volatile_files = 0
         number_of_deleted_tr = 0
         number_of_settled_tr = 0
         number_of_undeleted_tr = 0
@@ -160,6 +142,7 @@ def cleanup_database(request, **kwargs):
             f'{number_of_deleted_docs} documents have been removed.',
             f'{number_of_deleted_revisions} revisions have been removed.',
             f'{number_of_deleted_archived_revisions} archived revisions have been removed.',
+            f'{number_of_removed_volatile_files} volatile files have been removed.',
             f'{number_of_removed_tags} tags have been removed.',
             f'{number_of_deleted_tr} time records marked as deleted have been removed.',
             f'{number_of_settled_tr} time records marked as settled have been removed.',
@@ -183,6 +166,56 @@ def cleanup_database(request, **kwargs):
             'success': success,
             'error': error,
         })
+
+
+@login_required
+@permission_required("doc.cleanup")
+def cleanup_filesystem(request, **kwargs):
+    """Allows to clean up the media directory."""
+
+    success = []
+    error = []
+
+    if request.method == 'POST':
+        try:
+            result = subprocess.run(
+                [sys.executable, 'manage.py', 'cleanup_filesystem'],
+                cwd=settings.BASE_DIR,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            output = result.stdout
+
+            now = timezone.now()
+            datetime_string = now.strftime("%Y-%m-%d %H:%M")
+            doc = Doc.objects.create(
+                title=f"Filesystem cleanup of {datetime_string}",
+                text=output,
+                is_markdown=False,
+                is_archived=True,
+                time=now,
+                tag='syslog cleanup filesystem',
+                description=f'This is an automatically created entry from the filesystem cleanup process.',
+            )
+            doc.tags.add("syslog")
+            doc.tags.add("cleanup")
+            doc.tags.add("filesystem")
+            doc.save()
+
+            success.append('The cleanup has been done.')
+            success.append('The protocol of the process has been saved in the database.')
+            success.append('A zip file with the removed files can be found in the directory named trash.')
+
+        except subprocess.CalledProcessError as e:
+            error.append("The cleanup command failed.")
+            error.append(f"Error output:\n{e.stderr}")
+
+    return TemplateResponse(request, "cleanup_filesystem.html", {
+        'page_title': "Cleanup filesystem",
+        'success': success,
+        'error': error,
+    })
 
 
 @login_required

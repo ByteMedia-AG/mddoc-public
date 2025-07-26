@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from taggit.managers import TaggableManager
+import uuid
 
 
 class SearchManager(models.Manager):
@@ -30,7 +31,7 @@ class SearchManager(models.Manager):
             return f'tag:"{tag}"'
 
         query = re.sub(r'\b(and|or|not|near)\b', lambda m: m.group(1).upper(), query, flags=re.IGNORECASE)
-        query = re.sub(r'#(\S+)', repl_tag, query)
+        query = re.sub(r'#([a-zA-Z0-9_*\-]+)', repl_tag, query)
         query = re.sub(r'\s+', ' ', query).strip()  # Normalize the query string.
 
         qs = self.get_queryset()
@@ -76,6 +77,7 @@ class Doc(models.Model):
     reactivation_time = models.DateTimeField(blank=True, null=True, verbose_name='Reactivation time')
     deadline = models.DateTimeField(blank=True, null=True, verbose_name='Deadline')
     completed_at = models.DateTimeField(blank=True, null=True, verbose_name='Completed')
+    uuid = models.UUIDField(blank=False, null=False, unique=True, default=uuid.uuid4)
 
     objects = SearchManager()
 
@@ -100,6 +102,7 @@ class Doc(models.Model):
         """
         revision = Doc.objects.get(pk=self.pk)
         revision.pk = None
+        revision.uuid = None
         if revision.is_archived and revision.successor is None:
             revision.deleted_at = None
         else:
@@ -154,6 +157,8 @@ class Doc(models.Model):
             self.has_unsettled_tr = self.time_records.filter(settled_at__isnull=True, deleted_at__isnull=True).exists()
         if not self.time:
             self.time = self.created_at or timezone.now()
+        if not self.uuid:
+            self.uuid = uuid.uuid4()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -185,6 +190,10 @@ class File(models.Model):
     extension = models.CharField(blank=True, null=True, max_length=20)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     sha256 = models.CharField(blank=True, null=True, max_length=64)
+    # Files that are labelled as volatile are not transferred to the new
+    # version of the document during revision.
+    is_volatile = models.BooleanField(blank=False, null=False, default=False, db_default=False)
+    uuid = models.UUIDField(blank=False, null=False, unique=True, default=uuid.uuid4)
 
     def save(self, *args, **kwargs):
         if self.file and not self.size:

@@ -15,14 +15,22 @@ beautifulsoup4==4.13.4
     #   -r requirements.in
     #   srutil
     #   wikipedia
+brotli==1.1.0
+    # via fonttools
 certifi==2025.7.9
     # via
     #   requests
     #   selenium
+cffi==1.17.1
+    # via weasyprint
 charset-normalizer==3.4.2
     # via requests
 crispy-bootstrap5==2025.6
     # via -r requirements.in
+cssselect2==0.8.0
+    # via weasyprint
+deprecated==1.2.18
+    # via pikepdf
 django==5.2.4
     # via
     #   -r requirements.in
@@ -43,6 +51,8 @@ events==0.5
     # via -r requirements.in
 faker==37.4.0
     # via -r requirements.in
+fonttools[woff]==4.59.0
+    # via weasyprint
 googlemaps==4.10.0
     # via -r requirements.in
 h11==0.16.0
@@ -55,6 +65,8 @@ ioutil==1.0.3
     # via local
 local==1.0.0
     # via -r requirements.in
+lxml==6.0.0
+    # via pikepdf
 markdown==3.8.2
     # via -r requirements.in
 numpy==2.3.1
@@ -66,17 +78,31 @@ outcome==1.3.0.post0
     #   trio
     #   trio-websocket
 packaging==25.0
-    # via webdriver-manager
+    # via
+    #   pikepdf
+    #   webdriver-manager
 pandas==2.3.1
     # via ioutil
+pikepdf==9.10.2
+    # via -r requirements.in
+pillow==11.3.0
+    # via
+    #   pikepdf
+    #   weasyprint
 pyarrow==20.0.0
     # via
     #   ioutil
     #   local
+pycparser==2.22
+    # via cffi
+pydyf==0.11.0
+    # via weasyprint
 pygments==2.19.2
     # via -r requirements.in
 pyperclip==1.9.0
     # via srutil
+pyphen==0.17.2
+    # via weasyprint
 pysocks==1.7.1
     # via urllib3
 python-dateutil==2.9.0.post0
@@ -85,6 +111,8 @@ python-dotenv==1.1.1
     # via webdriver-manager
 pytz==2025.2
     # via pandas
+pyyaml==6.0.2
+    # via -r requirements.in
 requests==2.32.4
     # via
     #   -r requirements.in
@@ -112,6 +140,12 @@ srutil==1.0.3
     #   local
 tabulate==0.9.0
     # via srutil
+tinycss2==1.4.0
+    # via
+    #   cssselect2
+    #   weasyprint
+tinyhtml5==2.0.0
+    # via weasyprint
 toml==0.10.2
     # via ioutil
 trio==0.30.0
@@ -133,11 +167,22 @@ urllib3[socks]==2.5.0
     #   requests
     #   selenium
     #   srutil
+weasyprint==65.1
+    # via -r requirements.in
 webdriver-manager==4.0.2
     # via -r requirements.in
+webencodings==0.5.1
+    # via
+    #   cssselect2
+    #   tinycss2
+    #   tinyhtml5
 websocket-client==1.8.0
     # via selenium
 wikipedia==1.4.0
     # via srutil
+wrapt==1.17.2
+    # via deprecated
 wsproto==1.2.0
     # via trio-websocket
+zopfli==0.2.3.post1
+    # via fonttools

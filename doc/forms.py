@@ -161,6 +161,10 @@ class CleanupForm(forms.Form):
         label="Revisions of archived documents",
         required=False,
     )
+    remove_volatile_files_of_revisions = forms.BooleanField(
+        label="Volatile files of revisions",
+        required=False,
+    )
     remove_unused_tags = forms.BooleanField(
         label="Unused tags",
         required=False,
@@ -189,7 +193,7 @@ class CleanupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.add_input(Submit('submit', 'Do CleanUp', css_class="btn btn-secondary"))
+        self.helper.add_input(Submit('submit', 'Do CleanUp', css_class="btn btn-primary"))
         layout = [
             Row(
                 Column(

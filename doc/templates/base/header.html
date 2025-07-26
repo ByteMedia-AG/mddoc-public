@@ -27,6 +27,12 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+                        <li class="nav-item pe-0 me-3">
+                            <a class="nav-link" href="{% url 'doc:status' %}">
+                                <i class="bi bi-gear"></i>
+                            </a>
+                        </li>
+                        {% comment %}<!--
                         <li class="nav-item dropdown pe-0 me-4">
                             <button class="btn btn-link nav-link px-0 py-2 dropdown-toggle d-flex align-items-center" id="utils" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Utils">
                                 <i class="bi bi-gear"></i>
@@ -47,8 +53,15 @@
                                         <i class="bi bi-database-fill-gear me-2"></i> Cleanup database
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'doc:cleanup-filesystem' %}">
+                                        <i class="bi bi-hdd me-2"></i> Cleanup filesystem
+                                    </a>
+                                </li>
                             </ul>
                         </li>
+                        -->
+                        {% endcomment %}
                         <li class="nav-item dropdown pe-0 me-4">
                             <button class="btn btn-link nav-link px-0 py-2 dropdown-toggle d-flex align-items-center" id="nav-user" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="User">
                                 <i class="bi bi-person-fill"></i>

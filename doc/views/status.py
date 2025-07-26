@@ -18,6 +18,7 @@ def status(request, **kwargs):
     trs = {}
     trs_time = {}
     file = {}
+    file_time = {}
 
     docs['All'] = Doc.objects.all().count()
     docs['Current'] = Doc.objects.filter(
@@ -49,6 +50,9 @@ def status(request, **kwargs):
         deleted_at__isnull=False
     ).count()
 
+    file_time['Youngest'] = File.objects.aggregate(Max('uploaded_at'))['uploaded_at__max']
+    file_time['Oldest'] = File.objects.aggregate(Min('uploaded_at'))['uploaded_at__min']
+
     file['All'] = File.objects.all().count()
     file['Duplicates'] = (
         File.objects
@@ -58,8 +62,6 @@ def status(request, **kwargs):
         .aggregate(redundant=Sum(F('dupes') - 1))['redundant'] or 0
     )
     file['Orphaned'] = File.objects.filter(docs__isnull=True).count()
-
-    print(duplicate_files())
 
     # if True:
     #     duplicate_groups = (
@@ -91,5 +93,6 @@ def status(request, **kwargs):
         'trs': trs,
         'trs_time': trs_time,
         'file': file,
+        'file_time': file_time,
         'settings': flat_settings,
     })

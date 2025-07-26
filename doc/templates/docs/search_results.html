@@ -22,36 +22,41 @@
                 </div>
                 <div class="flex-grow-1">
                     <div class="d-flex w-100 justify-content-between">
-                        <h6 class="d-inline mb-1">{{ t.title }}</h6>
-                        <small class="text-muted text-nowrap mt-1">{{ t.updated_at|timesince }}</small>
+                        <div>
+                            <h6 class="mb-1">{{ t.title }}</h6>
+                            <small class="mb-1">
+                                {% if t.time %}
+                                {{ t.time|date:"SHORT_DATE_FORMAT" }}&nbsp;&mdash;
+                                {% else %}
+                                {{ t.created_at|date:"SHORT_DATE_FORMAT" }}&nbsp;&mdash;
+                                {% endif %}
+                                {% if t.description %}
+                                {{ t.description|truncatechars:300 }}
+                                {% else %}
+                                {{ t.text|truncatechars:300 }}
+                                {% endif %}
+                            </small>
+                            {% if not t.successor %}{% if t.reactivation_time or t.deadline or t.completed_at %}
+                            <div class="mt-2">
+                                {% if t.reactivation_time %}
+                                <span class="badge bg-transparent text-primary border border-primary me-1">Live in {{ t.reactivation_time|timeuntil:now }}</span>
+                                {% endif %}
+                                {% if t.deadline and t.deadline > now %}
+                                <span class="badge bg-transparent text-warning fw-normal border border-warning me-1">Due in {{ t.deadline|timeuntil:now }}</span>
+                                {% elif t.deadline and t.deadline < now and not t.completed_at %}
+                                <span class="badge bg-transparent text-danger border border-danger me-1">Overdue &mdash; {{ t.deadline|date:"F j, Y, H:i" }}</span>
+                                {% endif %}
+                                {% if t.completed_at %}
+                                <span class="badge bg-transparent text-success fw-normal border border-success me-1">Completed on {{ t.completed_at|date:"F j, Y" }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}{% endif %}
+                        </div>
+                        <div class="ms-3">
+                            <small class="text-muted text-nowrap mt-1 d-block text-end font-monospace opacity-50" title="Last updated at" style="font-size:11px;">{{ t.updated_at|date:"Y-m-d H:i" }}</small>
+                            <small class="text-muted text-nowrap mt-1 d-block text-end font-monospace opacity-75" title="Created at" style="font-size:11px;">{{ t.created_at|date:"Y-m-d H:i" }}</small>
+                        </div>
                     </div>
-                    <small class="mb-1">
-                        {% if t.time %}
-                        {{ t.time|date:"SHORT_DATE_FORMAT" }}&nbsp;&mdash;
-                        {% else %}
-                        {{ t.created_at|date:"SHORT_DATE_FORMAT" }}&nbsp;&mdash;
-                        {% endif %}
-                        {% if t.description %}
-                        {{ t.description|truncatechars:300 }}
-                        {% else %}
-                        {{ t.text|truncatechars:300 }}
-                        {% endif %}
-                    </small>
-                    {% if not t.successor %}{% if t.reactivation_time or t.deadline or t.completed_at %}
-                    <div class="mt-2">
-                        {% if t.reactivation_time %}
-                        <span class="badge bg-transparent text-primary border border-primary me-1">Live in {{ t.reactivation_time|timeuntil:now }}</span>
-                        {% endif %}
-                        {% if t.deadline and t.deadline > now %}
-                        <span class="badge bg-transparent text-warning fw-normal border border-warning me-1">Due in {{ t.deadline|timeuntil:now }}</span>
-                        {% elif t.deadline and t.deadline < now and not t.completed_at %}
-                        <span class="badge bg-transparent text-danger border border-danger me-1">Overdue &mdash; {{ t.deadline|date:"F j, Y, H:i" }}</span>
-                        {% endif %}
-                        {% if t.completed_at %}
-                        <span class="badge bg-transparent text-success fw-normal border border-success me-1">Completed on {{ t.completed_at|date:"F j, Y" }}</span>
-                        {% endif %}
-                    </div>
-                    {% endif %}{% endif %}
                 </div>
             </div>
             {% if t.deleted_at and t.successor %}

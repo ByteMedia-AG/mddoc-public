@@ -1,0 +1,129 @@
+/* Tagify styled to resemble Bootstrap 5 input + badges */
+
+.tagify {
+  --tag-bg: var(--bs-secondary-bg);
+  --tag-hover: var(--bs-secondary-bg);
+  --tag-text-color: var(--bs-body-color);
+  --tag-border-radius: 0.375rem;
+  --tag-padding: 0.25rem 0.5rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.375rem 0.75rem;
+  min-height: auto;
+  height: calc(1.5em + 0.75rem + 2px);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tagify__tag {
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-secondary-color, #fff);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  padding: 0.2rem 0.2rem;
+  line-height: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 10;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.tagify__tag {
+  margin: 0 !important;
+  margin-right: 0.5rem !important;
+}
+
+.tagify__tag:hover,
+.tagify__tag:focus,
+.tagify__tag:active {
+  background-color: var(--bs-secondary-bg);
+  cursor: pointer;
+  outline: none;
+  box-shadow: none !important;
+  border: none !important;
+  transform: none;
+}
+
+.tagify__tag__removeBtn {
+  color: var(--bs-danger);
+  margin-left: 0.3rem;
+  font-size: 0.8em;
+  pointer-events: auto;
+  display: none !important;
+}
+
+.tagify__input {
+  color: var(--bs-body-color);
+  padding: 0 !important;
+  margin: 0 !important;
+  flex-grow: 1;
+  min-width: 150px;
+  align-self: center;
+  vertical-align: middle;
+}
+
+.tagify--focus {
+  border-color: var(--bs-border-color) !important;
+  box-shadow: none !important;
+}
+
+.tagify__dropdown {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  background-color: var(--bs-body-bg);
+  box-shadow: none;
+}
+
+.tagify__dropdown__item {
+  padding: 0.375rem 0.75rem;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+}
+
+.tagify__dropdown__item--active {
+  background-color: var(--bs-primary);
+  color: #fff;
+}
+
+.tagify__tag--focus {
+  background-color: var(--bs-secondary-bg) !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  transform: none !important;
+}
+
+.tagify__tag:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  transform: none !important;
+}
+
+/* Theme-sensitives Dropdown-Styling für Tagify auf Basis von data-bs-theme */
+[data-bs-theme="dark"] .tagify__dropdown {
+  border: 1px solid var(--bs-border-color, #495057);
+  border-radius: 0.375rem;
+  background-color: var(--bs-body-bg, #212529);
+  color: var(--bs-body-color, #f8f9fa);
+}
+
+[data-bs-theme="dark"] .tagify__dropdown__item {
+  color: var(--bs-body-color, #f8f9fa);
+  background-color: var(--bs-dark-bg-subtle, #2b2f32);
+}
+
+[data-bs-theme="dark"] .tagify__dropdown__item--active,
+[data-bs-theme="dark"] .tagify__dropdown__item:hover {
+  background-color: var(--bs-primary, #0d6efd);
+  color: var(--bs-primary-text-emphasis, #fff);
+}

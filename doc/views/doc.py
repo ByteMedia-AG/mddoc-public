@@ -3,6 +3,7 @@ import difflib
 import re
 
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import connection
 from django.db.models import Value
@@ -55,6 +56,8 @@ def docs(request):
         oby = 'time'
     elif oby == 'deadline':
         oby = 'deadline'
+    elif oby == 'created':
+        oby = 'created_at'
     else:
         oby = 'updated_at'
     if not asc:
@@ -598,7 +601,7 @@ def doc_set_reactivation_time(request, **kwargs):
         entity.reactivation_time = reactivation_time
         if reactivation_time:
             entity.is_flagged = False
-            entity.is_archived = True
+            # entity.is_archived = True
         entity.save()
     except Doc.DoesNotExist as e:
         return TemplateResponse(request, "doc.html", {
@@ -705,4 +708,5 @@ def doc(request, **kwargs):
         'checklist_formset': checklist_formset,
         'checklist': list(entity.checklist_items.order_by('position')),
         'images': images,
+        'can_md2pdf': settings.DOC_ALLOW_MD2PDF,
     })

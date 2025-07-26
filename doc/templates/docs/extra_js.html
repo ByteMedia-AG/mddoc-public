@@ -4,9 +4,8 @@
         const form = document.getElementById('refined_search');
         const tag = button.value.trim();
         const currentSearch = searchInput.value.trim();
-        const terms = new Set(currentSearch.split(/\s+/));
-        terms.add(tag);
-        searchInput.value = Array.from(terms).join(" ");
+        const terms = currentSearch ? currentSearch + ' ' + tag : tag;
+        searchInput.value = terms.trim();
         form.submit();
     }
 
@@ -41,15 +40,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderTags() {
         tagContainer.innerHTML = '';
-        const tags = (input.value.match(/#\S+/g) || []);
+        const tags = [...(input.value.match(/(?:\bnot\s+)?#([\w*-]+)/gi) || [])];
         tags.forEach(tag => {
             const badge = document.createElement('span');
             badge.className = 'badge bg-transparent border text-secondary me-2 mb-2';
-            badge.textContent = tag.slice(1);
+            const isNegated = tag.toLowerCase().startsWith('not');
+            const tagName = tag.match(/#([\w*-]+)/)?.[1] || '';
+            badge.textContent = isNegated ? `not:${tagName}` : tagName;
             badge.style.cursor = 'pointer';
 
             badge.onclick = () => {
-                input.value = input.value.replace(tag, '').trim();
+                const escaped = tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const pattern = new RegExp(`(?:\\bnot\\s+)?${escaped}\\b`, 'gi');
+                input.value = input.value.replace(pattern, '').replace(/\s+/g, ' ').trim();
                 renderTags();
                 input.form.submit();
             };
